@@ -5,21 +5,17 @@
 class Camera
 {
 public:
-	Camera(float _rad);
+	Camera();
+	Camera(glm::vec3 origin, glm::vec3 end, glm::mat4 proj);
 	~Camera();
 
-	void init(GLFWwindow *window);
-	void poll(GLFWwindow *window);
+	void setUp(glm::vec3 origin, glm::vec3 end, glm::mat4 proj);
 
 private:
 	
-	float direction[3];
-	float position[3];
+	glm::vec3 direction;
+	glm::vec3 position;
 
-	float zoomFactor;
+	glm::mat4 projMat;
 
-	double newTime = 0.0;
-	double deltaTime = 0.0;
-	double currTime = 0.0;
-	const float PI = 3.14159265358979f;
 };

@@ -12,13 +12,12 @@ struct sphereData{
 	//GLfloat s;
 	//GLfloat t;
 };
-class Sphere :
-	public Mesh
+class Sphere : public Mesh
 {
 public:
 	// Creates a sphere  
-	Sphere(glm::vec3 _pos, float _mass, float _rad);
-	~Sphere(void);
+	Sphere(glm::vec3 _pos, float _rad);
+	~Sphere();
 
 	Sphere()
 	{

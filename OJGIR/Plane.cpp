@@ -45,6 +45,11 @@ Plane::Plane(float x, float y, float z, float dX, float dZ) {
 	}
 }
 
+Plane::~Plane()
+{
+
+}
+
 void Plane::createBuffers() {
 
 	planeData* vData;

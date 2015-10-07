@@ -28,7 +28,7 @@ public:
 		dim[1] = 0;
 	};
 
-	~Plane(void);
+	~Plane();
 
 	Plane(float x, float y, float z, float dX, float dZ);
 

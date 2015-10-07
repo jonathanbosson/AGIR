@@ -81,6 +81,11 @@ Cuboid::Cuboid(float x, float y, float z, float dX, float dY, float dZ) {
 
 }
 
+Cuboid::~Cuboid()
+{
+
+}
+
 void Cuboid::createBuffers() {
 
 	cuboidData* vData;

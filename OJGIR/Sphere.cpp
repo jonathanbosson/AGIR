@@ -1,6 +1,6 @@
 #include "Sphere.h"
 
-Sphere::Sphere(glm::vec3 _pos, float _mass, float _rad)
+Sphere::Sphere(glm::vec3 _pos, float _rad)
 {
 	position[0] = _pos[0];
 	position[1] = _pos[1];
@@ -100,6 +100,11 @@ Sphere::Sphere(glm::vec3 _pos, float _mass, float _rad)
 
 }
 
+Sphere::~Sphere()
+{
+
+}
+
 void Sphere::render()
 {
 	glBindVertexArray(vao);
@@ -109,7 +114,8 @@ void Sphere::render()
 }
 
 
-void Sphere::createBuffers() {
+void Sphere::createBuffers() 
+{
 
 	sphereData* vData;
 

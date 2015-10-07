@@ -30,7 +30,7 @@ public:
 	Cuboid(float x, float y, float z, float dX, float dY, float dZ);
 
 	void createBuffers();
-	~Cuboid(void);
+	~Cuboid();
 
 	void render();
 
