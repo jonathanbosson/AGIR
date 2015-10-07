@@ -1,8 +1,7 @@
 #pragma once
 #include "Mesh.h"
-#include "Utilities.h"
 
-struct sphereData{
+struct cuboidData{
 	GLfloat x;
 	GLfloat y;
 	GLfloat z;
@@ -12,15 +11,12 @@ struct sphereData{
 	//GLfloat s;
 	//GLfloat t;
 };
-class Sphere :
+
+class Cuboid :
 	public Mesh
 {
 public:
-	// Creates a sphere  
-	Sphere(glm::vec3 _pos, float _mass, float _rad);
-	~Sphere(void);
-
-	Sphere()
+	Cuboid()
 	{
 		vao = 0;
 		vertexbuffer = 0;
@@ -31,17 +27,19 @@ public:
 		nTris = 0;
 	};
 
-	void createSphere(float radius, int segments);
+	Cuboid(float x, float y, float z, float dX, float dY, float dZ);
+
 	void createBuffers();
+	~Cuboid(void);
+
 	void render();
 
-	float getRadius(){ return radius; }
-
 private:
-
 	int nVerts; // Number of vertices in the vertex array
 	int nTris;  // Number of triangles in the index array (may be zero)
 
-	float radius;
+	texST* stArray;
+
+	float dim[3];
 
 };

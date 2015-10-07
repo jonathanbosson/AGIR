@@ -1,53 +1,89 @@
-#include "Plane.h"
-#include "Utilities.h"
+#include "Cuboid.h"
 
-Plane::Plane(float x, float y, float z, float dX, float dZ) {
 
+Cuboid::Cuboid(float x, float y, float z, float dX, float dY, float dZ) {
 	position[0] = x;
 	position[1] = y;
 	position[2] = z;
 	dim[0] = dX;
-	dim[1] = dZ;
+	dim[1] = dY;
+	dim[2] = dZ;
 
 	GLfloat vertex_array_data[] = {
-		//Vertex								 Normals						 Texture  
-		-dX / 2.0f, 0.0f, dZ / 2.0f,		0.0f, 1.0f, 0.0f,
-		dX / 2.0f, 0.0f, dZ / 2.0f,			0.0f, 1.0f, 0.0f,
-		dX / 2.0f, 0.0f, -dZ / 2.0f,		 0.0f, 1.0f, 0.0f,
-		-dX / 2.0f, 0.0f, -dZ / 2.0f,		 0.0f, 1.0f, 0.0f, 
+		-dX / 2.0f, -dY / 2.0f, dZ / 2.0f,		0.0f, 0.0f, 1.0f,  //1 - 0
+		dX / 2.0f, -dY / 2.0f, dZ / 2.0f,		0.0f, 0.0f, 1.0f, //2 - 1
+		dX / 2.0f, dY / 2.0f, dZ / 2.0f,		0.0f, 0.0f, 1.0f,   //3 - 2
+		-dX / 2.0f, dY / 2.0f, dZ / 2.0f,		0.0f, 0.0f, 1.0f,  //4 - 3 
+		-dX / 2.0f, -dY / 2.0f, -dZ / 2.0f,		0.0f, 0.0f, -1.0f, //5 - 4 
+		dX / 2.0f, -dY / 2.0f, -dZ / 2.0f,		0.0f, 0.0f, -1.0f, //6 - 5
+		dX / 2.0f, dY / 2.0f, -dZ / 2.0f,		0.0f, 0.0f, -1.0f,  //7 - 6 
+		-dX / 2.0f, dY / 2.0f, -dZ / 2.0f,		0.0f, 0.0f, -1.0f, //8 - 7
+
+		-dX / 2.0f, -dY / 2.0f, dZ / 2.0f,		-1.0f, 0.0f, 0.0f, //1 - 8
+		dX / 2.0f, -dY / 2.0f, dZ / 2.0f,		-1.0f, 0.0f, 0.0f,  //2 - 9
+		dX / 2.0f, dY / 2.0f, dZ / 2.0f,		1.0f, 0.0f, 0.0f,   //3 - 10
+		-dX / 2.0f, dY / 2.0f, dZ / 2.0f,		1.0f, 0.0f, 0.0f,  //4 - 11
+		-dX / 2.0f, -dY / 2.0f, -dZ / 2.0f,		-1.0f, 0.0f, 0.0f, //5 - 12
+		dX / 2.0f, -dY / 2.0f, -dZ / 2.0f,		-1.0f, 0.0f, 0.0f, //6 - 13
+		dX / 2.0f, dY / 2.0f, -dZ / 2.0f,		1.0f, 0.0f, 0.0f,  //7 - 14
+		-dX / 2.0f, dY / 2.0f, -dZ / 2.0f,		1.0f, 0.0f, 0.0f,  //8 - 15
+
+		-dX / 2.0f, -dY / 2.0f, dZ / 2.0f,		0.0f, -1.0f, 0.0f,  //1 - 16
+		dX / 2.0f, -dY / 2.0f, dZ / 2.0f,		0.0f, 1.0f, 0.0f,  //2 - 17
+		dX / 2.0f, dY / 2.0f, dZ / 2.0f,		0.0f, 1.0f, 0.0f,   //3 - 18
+		-dX / 2.0f, dY / 2.0f, dZ / 2.0f,		0.0f, -1.0f, 0.0f,  //4 - 19
+		-dX / 2.0f, -dY / 2.0f, -dZ / 2.0f,		0.0f, -1.0f, 0.0f, //5 - 20
+		dX / 2.0f, -dY / 2.0f, -dZ / 2.0f,		0.0f, 1.0f, 0.0f, //6 - 21
+		dX / 2.0f, dY / 2.0f, -dZ / 2.0f,		0.0f, 1.0f, 0.0f,  //7 - 22
+		-dX / 2.0f, dY / 2.0f, -dZ / 2.0f,		0.0f, -1.0f, 0.0f, //8 - 23
 	};
 
 	static const GLuint index_array_data[] = {
-		0, 1, 2,
-		0, 2, 3
+		0, 1, 2, //Z-positiv/nära
+		0, 2, 3, //
+		7, 5, 4, //Z-negativ/borta
+		7, 6, 5, //
+		8, 12, 9, //X-negativ/vänster
+		13, 9, 12, //
+		10, 14, 11, //X-positiv/höger
+		11, 14, 15, //
+		17, 21, 18, //Y-positiv/ovan
+		18, 21, 22, //
+		16, 19, 23, //Y-negativ/under
+		20, 16, 23, //  
 	};
 
-	nVerts = 4;
-	nTris = 2;
+	nVerts = 24;
+	nTris = 12;
 
-	vertexArray = new vertex[nVerts];
+	vertexArray = new vertex[nVerts]; // coordinates, normals and texture coordinates
+	//stArray = new texST[nVerts];
 	indexArray = new triangle[nTris];
 
-	int dIndex;
+	int dIndex = 0;
 	for (int i = 0; i < nVerts; i++) {
 		dIndex = i * 6;
 		vertexArray[i].xyz[0] = vertex_array_data[dIndex];
-		vertexArray[i].xyz[0] = vertex_array_data[dIndex + 1];
-		vertexArray[i].xyz[0] = vertex_array_data[dIndex + 2];
+		vertexArray[i].xyz[1] = vertex_array_data[dIndex + 1];
+		vertexArray[i].xyz[2] = vertex_array_data[dIndex + 2];
 		vertexArray[i].nxyz[0] = vertex_array_data[dIndex + 3];
-		vertexArray[i].nxyz[0] = vertex_array_data[dIndex + 4];
-		vertexArray[i].nxyz[0] = vertex_array_data[dIndex + 5];
+		vertexArray[i].nxyz[1] = vertex_array_data[dIndex + 4];
+		vertexArray[i].nxyz[2] = vertex_array_data[dIndex + 5];
+		//stArray[i].st[0] = vertex_array_data[dIndex + 6];
+		//stArray[i].st[1] = vertex_array_data[dIndex + 7];
 	}
+
 	for (int i = 0; i < nTris; i++) {
 		indexArray[i].index[0] = index_array_data[i*3];
-		indexArray[i].index[1] = index_array_data[i * 3 + 1];
-		indexArray[i].index[2] = index_array_data[i * 3 + 2];
+		indexArray[i].index[1] = index_array_data[i*3 + 1];
+		indexArray[i].index[2] = index_array_data[i*3 + 2];
 	}
+
 }
 
-void Plane::createBuffers() {
+void Cuboid::createBuffers() {
 
-	planeData* vData;
+	cuboidData* vData;
 
 	// Generate one vertex array object (VAO) and bind it
 	glGenVertexArrays(1, &(vao));
@@ -61,9 +97,9 @@ void Plane::createBuffers() {
 	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
 	// Present our vertex coordinates to OpenGL
 	glBufferData(GL_ARRAY_BUFFER,
-		nVerts * sizeof(planeData), NULL, GL_STATIC_DRAW);
+		nVerts * sizeof(cuboidData), NULL, GL_STATIC_DRAW);
 
-	vData = (planeData*)glMapBufferRange(GL_ARRAY_BUFFER, 0, sizeof(planeData) *nVerts,
+	vData = (cuboidData*)glMapBufferRange(GL_ARRAY_BUFFER, 0, sizeof(cuboidData) *nVerts,
 		GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT | GL_MAP_UNSYNCHRONIZED_BIT);
 
 	for (int i = 0; i < nVerts; i++) {
@@ -91,9 +127,9 @@ void Plane::createBuffers() {
 	// Stride 8 floats (interleaved array with 8 floats per vertex)
 	// Array buffer offset 0, 3 or 6 floats (offset into first vertex)
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
-		sizeof(planeData), (void*)0); // xyz coordinates
+		sizeof(cuboidData), (void*)0); // xyz coordinates
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE,
-		sizeof(planeData), (void*)(3 * sizeof(GLfloat))); // normals
+		sizeof(cuboidData), (void*)(3 * sizeof(GLfloat))); // normals
 	//glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE,
 	//	sizeof(cuboidData), (void*)(6 * sizeof(GLfloat))); // texcoords
 
@@ -124,11 +160,9 @@ void Plane::createBuffers() {
 
 }
 
-
-
-void Plane::render() {
+void Cuboid::render() {
 	glBindVertexArray(vao);
-	glDrawElements(GL_TRIANGLES, 3 * nTris, GL_UNSIGNED_INT, (void*)0);
+	glDrawElements(GL_TRIANGLES, nVerts, GL_UNSIGNED_INT, (void*)0);
 	// (mode, vertex count, type, element array buffer offset)
 	glBindVertexArray(0);
 }

@@ -1,42 +1,44 @@
 #pragma once
-#include "Entity.h"
+
+#include "Mesh.h"
 #include "Utilities.h"
 
-class Plane :
-	public Entity
-{
+struct planeData{
+	GLfloat x;
+	GLfloat y;
+	GLfloat z;
+	GLfloat nx;
+	GLfloat ny;
+	GLfloat nz;
+	//GLfloat s;
+	//GLfloat t;
+};
+
+class Plane : public Mesh {
 public:
-	Plane()
-	{
+	Plane() {
 		vao = 0;
 		vertexbuffer = 0;
 		indexbuffer = 0;
-		vertexarray = NULL;
-		indexarray = NULL;
-		nverts = 0;
-		ntris = 0;
+		vertexArray = NULL;
+		indexArray = NULL;
+		nVerts = 0;
+		nTris = 0;
+		dim[0] = 0;
+		dim[1] = 0;
 	};
 
-	Plane(glm::vec3 _pos, float _mass, glm::vec2 _dim);
 	~Plane(void);
 
-	glm::vec3 getNormal() { return normal; }
-	void setNormal(glm::vec3 n){ normal = n; }
+	Plane(float x, float y, float z, float dX, float dZ);
 
 	void render();
-	glm::vec2 getDim(){ return dim; }
+	void createBuffers();
 
 private:
-	GLuint vao;          // Vertex array object, the main handle for geometry
-	int nverts; // Number of vertices in the vertex array
-	int ntris;  // Number of triangles in the index array (may be zero)
-	GLuint vertexbuffer; // Buffer ID to bind to GL_ARRAY_BUFFER
-	GLuint indexbuffer;  // Buffer ID to bind to GL_ELEMENT_ARRAY_BUFFER
-	GLfloat *vertexarray; // Vertex array on interleaved format: x y z nx ny nz s t
-	GLuint *indexarray;   // Element index array
+	int nVerts;				// Number of vertices in the vertex array
+	int nTris;				// Number of triangles in the index array (may be zero)
 
-	glm::vec2 dim;
-	glm::vec3 normal;
-
-	void display(ostream& os) const;
+	float dim[2];
+	
 };

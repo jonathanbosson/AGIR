@@ -11,14 +11,10 @@ public:
 	void init(GLFWwindow *window);
 	void poll(GLFWwindow *window);
 
-	float getPhi(){ return phi; }
-	float getTheta(){ return theta; }
-	float getRad(){ return rad; }
-
 private:
-	float phi;
-	float theta;
-	float rad;
+	
+	float direction[3];
+	float position[3];
 
 	float zoomFactor;
 
@@ -27,4 +23,3 @@ private:
 	double currTime = 0.0;
 	const float PI = 3.14159265358979f;
 };
-
