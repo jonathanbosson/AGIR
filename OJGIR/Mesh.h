@@ -37,6 +37,12 @@ public:
 	void setPosition(float* p) { position[0] = p[0]; position[1] = p[1]; position[2] = p[2]; }
 	void setOrientation(float* o) { std::copy(o, o + 16, orientation); }
 
+	vertex* getVarray(){ return vertexArray; }
+	triangle* getTarray(){ return indexArray; }
+
+	int getVertNr(){ return nrofVerts; }
+	int getTriNr(){ return nrofTris; }
+
 	virtual void render() = 0;
 	virtual void createBuffers() = 0;
 

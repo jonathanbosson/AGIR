@@ -1,8 +1,21 @@
 #include "Ray.h"
 
+#define EPSILON  0.00001
 
 Ray::Ray()
 {
+	parent = nullptr;
+	rChild = nullptr;
+	tChild = nullptr;
+}
+
+Ray::Ray(glm::vec3 _origin, glm::vec3 _direction, Ray* _parent, std::vector<Mesh*>* _sceneData)
+{
+	origin = _origin;
+	direction = _direction;
+	parent = _parent;
+
+	Intersection(origin, direction, _sceneData);
 }
 
 
@@ -10,69 +23,74 @@ Ray::~Ray()
 {
 }
 
-void Ray::Intersection()
+void Ray::Intersection(glm::vec3 _origin, glm::vec3 _direction, std::vector<Mesh*>* _sceneData)
 {
-	//for ( objects)
+	vertex* vertexArray;
+	int vertNr;
+	triangle* triangleArray;
+	int triNr;
 
-	//triangles 
+	glm::vec3 hit;
+	glm::vec3 eVec1;
+	glm::vec3 eVec2;
+	glm::vec3 P; glm::vec3 Q; glm::vec3 T;
 
-	//for (int i = 0; i < selectedSize; i++) {
-	//	index2 = selectedVertices[i];
-	//	tempEdge = mVInfoArray[index2].edgePtr;
+	float pLength;
+	float invP; float u; float v; float t;
+	float* temp1; float* temp2;
 
-	//	do {
-	//		tempE = mEdgeArray[mEdgeArray[tempEdge].nextEdge].sibling;
+	//not done need to transform vertices of the object by its transforms
 
-	//		if (mVInfoArray[mEdgeArray[tempEdge].vertex].selected != 1.0f)
-	//		{
-	//			linAlg::calculateVec(mVertexArray[mEdgeArray[tempEdge].vertex].xyz, mVertexArray[index2].xyz, eVec1);
-	//			linAlg::calculateVec(mVertexArray[mEdgeArray[tempE].vertex].xyz, mVertexArray[index2].xyz, eVec2);
-	//			linAlg::crossProd(P, newDirr, eVec2);
+	for (int i = 0; i < _sceneData->size(); i++)
+	{
+		vertexArray = _sceneData->at(i)->getVarray();
+		vertNr = _sceneData->at(i)->getVertNr();
+		triangleArray = _sceneData->at(i)->getTarray();
+		triNr = _sceneData->at(i)->getTriNr();
 
-	//			pLength = linAlg::dotProd(eVec1, P);
-	//			if (pLength < -EPSILON || pLength > EPSILON)
-	//			{
-	//				invP = 1.f / pLength;
-	//				linAlg::calculateVec(newWPoint, mVertexArray[index2].xyz, T);
+		for (int j = 0; j < triNr; j++) {
 
-	//				u = linAlg::dotProd(T, P) * invP;
-	//				if (u > 0.0f && u < 1.0f)
-	//				{
-	//					linAlg::crossProd(Q, T, eVec1);
+			temp1 = vertexArray[triangleArray[j].index[0]].xyz;
+			temp2 = vertexArray[triangleArray[j].index[1]].xyz;
+			eVec1 = glm::vec3(temp1[0], temp1[1], temp1[2]) - glm::vec3(temp2[0], temp2[1], temp2[2]);
 
-	//					v = linAlg::dotProd(newDirr, Q)*invP;
+			temp2 = vertexArray[triangleArray[j].index[2]].xyz;
+			eVec2 = glm::vec3(temp1[0], temp1[1], temp1[2]) - glm::vec3(temp2[0], temp2[1], temp2[2]);
 
-	//					if (v > 0.0f && u + v < 1.0f)
-	//					{
-	//						t = linAlg::dotProd(eVec2, Q)*invP;
-	//						if (t > EPSILON && t < 0.1f)
-	//						{
-	//							//sIt->next->index = e[tempEdge].triangle;
-	//							tempVec[0] = newDirr[0] * t;
-	//							tempVec[1] = newDirr[1] * t;
-	//							tempVec[2] = newDirr[2] * t;
-	//							tempE = mVInfoArray[index2].edgePtr;
-	//							success = true;
-	//							if (linAlg::vecLength(tempVec) < linAlg::vecLength(intersection.nxyz)){
-	//								mIndex = index2;
-	//								intersection.xyz[0] = newWPoint[0] + tempVec[0];
-	//								intersection.xyz[1] = newWPoint[1] + tempVec[1];
-	//								intersection.xyz[2] = newWPoint[2] + tempVec[2];
-	//								intersection.nxyz[0] = tempVec[0];
-	//								intersection.nxyz[1] = tempVec[1];
-	//								intersection.nxyz[2] = tempVec[2];
-	//								linAlg::crossProd(vNorm, eVec2, eVec1);
-	//								linAlg::normVec(vNorm);
-	//							}
-	//						}
-	//					}
-	//				}
-	//			}
-	//		}
-	//		tempEdge = tempE;
+			P = glm::cross(_direction, eVec2);
 
-	//	} while (tempEdge != mVInfoArray[index2].edgePtr);
+			//linAlg::calculateVec(mVertexArray[mEdgeArray[tempEdge].vertex].xyz, mVertexArray[index2].xyz, eVec1);
+			//linAlg::calculateVec(mVertexArray[mEdgeArray[tempE].vertex].xyz, mVertexArray[index2].xyz, eVec2);
+			//linAlg::crossProd(P, newDirr, eVec2);
 
-	//	mVInfoArray[index2].selected = 1.0f;
-	//}
+			pLength = glm::dot(eVec1, P);
+			if (pLength < -EPSILON || pLength > EPSILON)
+			{
+				invP = 1.f / pLength;
+				
+				T = _origin - glm::vec3(temp1[0], temp1[1], temp1[2]);
+
+				u = glm::dot(T, P) * invP;
+				if (u > 0.0f && u < 1.0f)
+				{
+					Q = glm::cross( T, eVec1);
+
+					v = glm::dot(_origin, Q)*invP;
+
+					if (v > 0.0f && u + v < 1.0f)
+					{
+						t = glm::dot(eVec2, Q)*invP;
+						if (t > EPSILON && t < 0.1f)
+						{
+							hit = _origin + _direction*t;
+						}
+					}
+				}
+			}
+			
+		//mVInfoArray[index2].selected = 1.0f;
+		}
+	}
+
+	
 }
