@@ -9,6 +9,8 @@ public:
 	Image(int _x, int _y);
 	~Image();
 
+	void saveBMP();
+
 	int x;
 	int y;
 

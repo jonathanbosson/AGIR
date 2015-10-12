@@ -23,6 +23,9 @@ Ray::Ray(glm::vec3 _origin, glm::vec3 _direction, Ray* _parent, std::vector<Mesh
 
 Ray::~Ray()
 {
+	delete parent;
+	delete rChild;
+	delete tChild;
 }
 
 void Ray::Intersection(glm::vec3 _origin, glm::vec3 _direction, std::vector<Mesh*>* _sceneData)
@@ -60,10 +63,10 @@ void Ray::Intersection(glm::vec3 _origin, glm::vec3 _direction, std::vector<Mesh
 
 			temp1 = vertexArray[triangleArray[j].index[0]].xyz;
 			temp2 = vertexArray[triangleArray[j].index[1]].xyz;
-			eVec1 = glm::vec3(temp1[0], temp1[1], temp1[2]) - glm::vec3(temp2[0], temp2[1], temp2[2]);
+			eVec1 = glm::vec3(temp2[0], temp2[1], temp2[2]) - glm::vec3(temp1[0], temp1[1], temp1[2]);
 
 			temp2 = vertexArray[triangleArray[j].index[2]].xyz;
-			eVec2 = glm::vec3(temp1[0], temp1[1], temp1[2]) - glm::vec3(temp2[0], temp2[1], temp2[2]);
+			eVec2 = glm::vec3(temp2[0], temp2[1], temp2[2]) - glm::vec3(temp1[0], temp1[1], temp1[2]);
 
 			P = glm::cross(nDirection, eVec2);
 
@@ -79,12 +82,12 @@ void Ray::Intersection(glm::vec3 _origin, glm::vec3 _direction, std::vector<Mesh
 				{
 					Q = glm::cross( T, eVec1);
 
-					v = glm::dot(nOrigin, Q)*invP;
+					v = glm::dot(nDirection, Q)*invP;
 
 					if (v > 0.0f && u + v < 1.0f)
 					{
 						t = glm::dot(eVec2, Q)*invP;
-						if (t > EPSILON && t < 0.1f)
+						if (t > EPSILON)
 						{
 							hit = nOrigin + nDirection*t;
 							rgba = glm::vec4(_sceneData->at(i)->getOType(), _sceneData->at(i)->getOType(), _sceneData->at(i)->getOType(), _sceneData->at(i)->getOType());
