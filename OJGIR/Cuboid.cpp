@@ -9,6 +9,10 @@ Cuboid::Cuboid(float x, float y, float z, float dX, float dY, float dZ) {
 	dim[1] = dY;
 	dim[2] = dZ;
 
+	testOType = 0.5f;
+
+	orientation = glm::mat4(1.0f);
+
 	GLfloat vertex_array_data[] = {
 		-dX / 2.0f, -dY / 2.0f, dZ / 2.0f,		0.0f, 0.0f, 1.0f,  //1 - 0
 		dX / 2.0f, -dY / 2.0f, dZ / 2.0f,		0.0f, 0.0f, 1.0f, //2 - 1

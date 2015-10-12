@@ -28,20 +28,23 @@ public:
 	Mesh();
 	~Mesh();
 
-	float* getPosition(){ return position; };
-	float* getOrientation(){ return orientation; };
-	void getPosition(float* vec){ vec[0] = position[0]; vec[1] = position[1]; vec[2] = position[2]; };
-	void getOrientation(float* mat);
+	glm::vec3 getPosition(){ return position; };
+	glm::mat4 getOrientation(){ return orientation; };
+	void getPosition(glm::vec3* vec){ vec->x = position[0]; vec->y = position[1]; vec->z = position[2]; };
+	void getOrientation(glm::mat4* mat);
 
 
-	void setPosition(float* p) { position[0] = p[0]; position[1] = p[1]; position[2] = p[2]; }
-	void setOrientation(float* o) { std::copy(o, o + 16, orientation); }
+	void setPosition(glm::vec3 p) { position = p;// position[1] = p[1]; position[2] = p[2];
+																							}
+	void setOrientation(glm::mat4 o) {orientation = o;// std::copy(o, o + 16, orientation); 
+																							}
+	float getOType() { return testOType; }
 
 	vertex* getVarray(){ return vertexArray; }
 	triangle* getTarray(){ return indexArray; }
 
-	int getVertNr(){ return nrofVerts; }
-	int getTriNr(){ return nrofTris; }
+	int getVertNr(){ return nVerts; }
+	int getTriNr(){ return nTris; }
 
 	virtual void render() = 0;
 	virtual void createBuffers() = 0;
@@ -50,17 +53,19 @@ protected:
 
 	//array that stres all vertices of the mesh
 	vertex* vertexArray;
-	int nrofVerts;
+	int nVerts;
 
 	//Array that stores all triangles of the mesh
 	triangle* indexArray;
-	int nrofTris;
+	int nTris;
 
-	float position[3];
-	float orientation[16];
+	glm::vec3 position;
+	glm::mat4 orientation;
 
 	GLuint vao;          // Vertex array object, the main handle for geometry
 	GLuint vertexbuffer; // Buffer ID to bind to GL_ARRAY_BUFFER
 	GLuint indexbuffer;  // Buffer ID to bind to GL_ELEMENT_ARRAY_BUFFER
+
+	float testOType;
 };
 

@@ -11,6 +11,8 @@ public:
 
 	void setUp(glm::vec3 origin, glm::vec3 end);
 
+	glm::mat4 getCTransform() { return cTransform; }
+
 private:
 	
 	glm::mat4 orientation;

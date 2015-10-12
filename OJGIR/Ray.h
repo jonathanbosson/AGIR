@@ -15,9 +15,11 @@ public:
 
 	~Ray();
 
-	void Intersection(glm::vec3 _origin, glm::vec3 _direction, std::vector<Mesh*>* sceneData);
+	void Intersection(glm::vec3 _origin, glm::vec3 _direction, std::vector<Mesh*>* _sceneData);
 	void Reflection();
 	void Transmision();
+
+	glm::vec4 evaluate(){ return rgba; };
 
 private:
 

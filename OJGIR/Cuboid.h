@@ -35,9 +35,7 @@ public:
 	void render();
 
 private:
-	int nVerts; // Number of vertices in the vertex array
-	int nTris;  // Number of triangles in the index array (may be zero)
-
+	
 	texST* stArray;
 
 	float dim[3];

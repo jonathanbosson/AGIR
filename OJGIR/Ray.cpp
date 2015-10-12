@@ -15,6 +15,8 @@ Ray::Ray(glm::vec3 _origin, glm::vec3 _direction, Ray* _parent, std::vector<Mesh
 	direction = _direction;
 	parent = _parent;
 
+	rgba = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
+
 	Intersection(origin, direction, _sceneData);
 }
 
@@ -30,6 +32,9 @@ void Ray::Intersection(glm::vec3 _origin, glm::vec3 _direction, std::vector<Mesh
 	triangle* triangleArray;
 	int triNr;
 
+	glm::vec3 nOrigin;
+	glm::vec3 nDirection;
+
 	glm::vec3 hit;
 	glm::vec3 eVec1;
 	glm::vec3 eVec2;
@@ -43,6 +48,9 @@ void Ray::Intersection(glm::vec3 _origin, glm::vec3 _direction, std::vector<Mesh
 
 	for (int i = 0; i < _sceneData->size(); i++)
 	{
+		nOrigin = glm::vec3(_sceneData->at(i)->getOrientation() * glm::vec4(_origin - _sceneData->at(i)->getPosition(), 1.0f));
+		nDirection = glm::vec3(_sceneData->at(i)->getOrientation() * glm::vec4(_direction, 1.0f));
+
 		vertexArray = _sceneData->at(i)->getVarray();
 		vertNr = _sceneData->at(i)->getVertNr();
 		triangleArray = _sceneData->at(i)->getTarray();
@@ -57,38 +65,33 @@ void Ray::Intersection(glm::vec3 _origin, glm::vec3 _direction, std::vector<Mesh
 			temp2 = vertexArray[triangleArray[j].index[2]].xyz;
 			eVec2 = glm::vec3(temp1[0], temp1[1], temp1[2]) - glm::vec3(temp2[0], temp2[1], temp2[2]);
 
-			P = glm::cross(_direction, eVec2);
-
-			//linAlg::calculateVec(mVertexArray[mEdgeArray[tempEdge].vertex].xyz, mVertexArray[index2].xyz, eVec1);
-			//linAlg::calculateVec(mVertexArray[mEdgeArray[tempE].vertex].xyz, mVertexArray[index2].xyz, eVec2);
-			//linAlg::crossProd(P, newDirr, eVec2);
+			P = glm::cross(nDirection, eVec2);
 
 			pLength = glm::dot(eVec1, P);
 			if (pLength < -EPSILON || pLength > EPSILON)
 			{
 				invP = 1.f / pLength;
 				
-				T = _origin - glm::vec3(temp1[0], temp1[1], temp1[2]);
+				T = nOrigin - glm::vec3(temp1[0], temp1[1], temp1[2]);
 
 				u = glm::dot(T, P) * invP;
 				if (u > 0.0f && u < 1.0f)
 				{
 					Q = glm::cross( T, eVec1);
 
-					v = glm::dot(_origin, Q)*invP;
+					v = glm::dot(nOrigin, Q)*invP;
 
 					if (v > 0.0f && u + v < 1.0f)
 					{
 						t = glm::dot(eVec2, Q)*invP;
 						if (t > EPSILON && t < 0.1f)
 						{
-							hit = _origin + _direction*t;
+							hit = nOrigin + nDirection*t;
+							rgba = glm::vec4(_sceneData->at(i)->getOType(), _sceneData->at(i)->getOType(), _sceneData->at(i)->getOType(), _sceneData->at(i)->getOType());
 						}
 					}
 				}
 			}
-			
-		//mVInfoArray[index2].selected = 1.0f;
 		}
 	}
 
