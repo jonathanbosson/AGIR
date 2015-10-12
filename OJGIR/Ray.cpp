@@ -48,8 +48,8 @@ void Ray::Intersection(glm::vec3 _origin, glm::vec3 _direction, std::vector<Mesh
 
 	for (int i = 0; i < _sceneData->size(); i++)
 	{
-		nOrigin = glm::vec3(_sceneData->at(i)->getOrientation() * glm::vec4(_origin - _sceneData->at(i)->getPosition(), 1.0f));
-		nDirection = glm::vec3(_sceneData->at(i)->getOrientation() * glm::vec4(_direction, 1.0f));
+		nOrigin = glm::vec3(glm::transpose(_sceneData->at(i)->getOrientation()) * glm::vec4(_origin - _sceneData->at(i)->getPosition(), 1.0f));
+		nDirection = glm::vec3(glm::transpose(_sceneData->at(i)->getOrientation()) * glm::vec4(_direction, 1.0f));
 
 		vertexArray = _sceneData->at(i)->getVarray();
 		vertNr = _sceneData->at(i)->getVertNr();

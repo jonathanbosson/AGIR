@@ -25,8 +25,8 @@ int main()
 	Camera cam(glm::vec3(0.0f, 1.5f, 0.0f), glm::vec3(0.0f, 1.5f, - 1.0f));
 
 	std::vector<Mesh*>* scene = new std::vector<Mesh*>;
-	scene->push_back(new Cuboid(-0.1f, 1.5f, -2.0f, 0.2f, 0.2f, 0.2f));
-	scene->push_back(new Plane(0.0f, 0.0f, 0.0f, 2.0f, 2.0f));
+	scene->push_back(new Cuboid(0.0f, 1.5f, -2.0f, 0.2f, 0.2f, 0.2f));
+	//scene->push_back(new Plane(0.0f, 0.0f, 0.0f, 2.0f, 2.0f));
 	
 	Ray* rIt;
 	glm::vec3 rDirection = glm::mat3(cam.getCTransform()) * (glm::vec3(0.0f, 0.0f, -1.0f) - glm::vec3(0.0f, 0.0f, 0.0f));

@@ -1,9 +1,9 @@
 //! Namespace that handles necassary includes and various functions
 #pragma once
 
-#include "glew.h"
+#include "GL/glew.h"
 #include <Windows.h>
-#include "glfw3.h"
+#include "GLFW/glfw3.h"
 
 #include <glm/vec3.hpp> // glm::vec3
 #include <glm/vec4.hpp> // glm::vec4
