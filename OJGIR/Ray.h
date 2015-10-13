@@ -25,11 +25,12 @@ private:
 
 	glm::vec3 direction;
 	
-	//???
 	glm::vec3 origin;
 	glm::vec3 hit;
 	glm::vec4 rgba;
 
+	int objectIndex;
+	int triangleIndex;
 
 	Ray* parent;
 	Ray* tChild;

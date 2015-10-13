@@ -38,7 +38,7 @@ public:
 																							}
 	void setOrientation(glm::mat4 o) {orientation = o;// std::copy(o, o + 16, orientation); 
 																							}
-	float getOType() { return testOType; }
+	float BRDF() { return testOType; }
 
 	vertex* getVarray(){ return vertexArray; }
 	triangle* getTarray(){ return indexArray; }

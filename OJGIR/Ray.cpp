@@ -38,10 +38,11 @@ void Ray::Intersection(glm::vec3 _origin, glm::vec3 _direction, std::vector<Mesh
 	glm::vec3 nOrigin;
 	glm::vec3 nDirection;
 
-	glm::vec3 hit;
 	glm::vec3 eVec1;
 	glm::vec3 eVec2;
 	glm::vec3 P; glm::vec3 Q; glm::vec3 T;
+
+	float nearestHit = 1000000;
 
 	float pLength;
 	float invP; float u; float v; float t;
@@ -89,14 +90,36 @@ void Ray::Intersection(glm::vec3 _origin, glm::vec3 _direction, std::vector<Mesh
 						t = glm::dot(eVec2, Q)*invP;
 						if (t > EPSILON)
 						{
-							hit = nOrigin + nDirection*t;
-							rgba = glm::vec4(_sceneData->at(i)->getOType(), _sceneData->at(i)->getOType(), _sceneData->at(i)->getOType(), _sceneData->at(i)->getOType());
+							if (glm::length(nDirection*t) < nearestHit)
+							{
+								objectIndex = i;
+								//triangleIndex = j;??
+								nearestHit = glm::length(nDirection*t);
+								hit = nOrigin + nDirection*t;
+							}
 						}
 					}
 				}
 			}
 		}
 	}
-
 	
+	Reflection();
+	rgba = glm::vec4(_sceneData->at(objectIndex)->BRDF());
+}
+
+
+void Ray::Reflection()
+{
+	
+}
+
+void Ray::Transmision()
+{
+
+}
+
+glm::vec4 Ray::evaluate()
+{
+	return rgba;
 }
