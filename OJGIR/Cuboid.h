@@ -27,7 +27,7 @@ public:
 		nTris = 0;
 	};
 
-	Cuboid(float x, float y, float z, float dX, float dY, float dZ);
+	Cuboid(float x, float y, float z, float dX, float dY, float dZ, float light, float tBRDF);
 
 	void createBuffers();
 	~Cuboid();

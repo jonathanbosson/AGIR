@@ -32,13 +32,15 @@ public:
 	glm::mat4 getOrientation(){ return orientation; };
 	void getPosition(glm::vec3* vec){ vec->x = position[0]; vec->y = position[1]; vec->z = position[2]; };
 	void getOrientation(glm::mat4* mat);
+	
 
 
 	void setPosition(glm::vec3 p) { position = p;// position[1] = p[1]; position[2] = p[2];
 																							}
 	void setOrientation(glm::mat4 o) {orientation = o;// std::copy(o, o + 16, orientation); 
 																							}
-	float BRDF() { return testOType; }
+	float BRDF() { return testBRDF; }
+	float getP() { return P; }
 
 	vertex* getVarray(){ return vertexArray; }
 	triangle* getTarray(){ return indexArray; }
@@ -66,6 +68,9 @@ protected:
 	GLuint vertexbuffer; // Buffer ID to bind to GL_ARRAY_BUFFER
 	GLuint indexbuffer;  // Buffer ID to bind to GL_ELEMENT_ARRAY_BUFFER
 
-	float testOType;
+	//shading variables
+	float lightEmission;
+	float testBRDF;
+	float P;
 };
 

@@ -1,7 +1,7 @@
 #include "Cuboid.h"
 
 
-Cuboid::Cuboid(float x, float y, float z, float dX, float dY, float dZ) {
+Cuboid::Cuboid(float x, float y, float z, float dX, float dY, float dZ, float _light, float _BRDF) {
 	position[0] = x;
 	position[1] = y;
 	position[2] = z;
@@ -9,7 +9,9 @@ Cuboid::Cuboid(float x, float y, float z, float dX, float dY, float dZ) {
 	dim[1] = dY;
 	dim[2] = dZ;
 
-	testOType = 0.5f;
+	testBRDF = _BRDF;
+	lightEmission = _light;
+	P = 0.5;
 
 	orientation = glm::mat4(1.0f);
 
