@@ -16,8 +16,10 @@ public:
 	~Ray();
 
 	void Intersection(glm::vec3 _origin, glm::vec3 _direction, std::vector<Mesh*>* _sceneData);
-	void Reflection();
+	void Reflection(glm::vec3 _origin, glm::vec3 _direction, std::vector<Mesh*>* _sceneData);
 	void Transmision();
+	
+	bool russianRoulette(int _objectIndex, std::vector<Mesh*>* _sceneData);
 
 	glm::vec4 evaluate();
 

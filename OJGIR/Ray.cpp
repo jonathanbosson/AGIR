@@ -104,20 +104,53 @@ void Ray::Intersection(glm::vec3 _origin, glm::vec3 _direction, std::vector<Mesh
 			}
 		}
 	}
-	
-	//Reflection();
-	//rgba = glm::vec4(_sceneData->at(objectIndex)->BRDF());
+	if (russianRoulette(objectIndex, _sceneData))
+	{
+		Reflection(hit, nDirection, _sceneData);
+		// if (transparent) Transmission();
+	}
 }
 
-
-void Ray::Reflection()
+bool Ray::russianRoulette(int _objectIndex, std::vector<Mesh*>* _sceneData)
 {
-	
+	// will it reflect (P) or terminate (1-P)?
+	float P = 0.7f;
+
+	//rescale f(x) and x after P. f(x) * 1/P, x [0, P] instead of [0, 1].
+	// integral perserved, int_0-P (f(x/P)/P) = int_0-1 (f(x))
+
+	// random number angle drawn [0, 2*pi] -> 
+	//if (k > 2 * pi*P)
+	//{
+	//	reevaluate E(<I>) = I / P
+	//	return false;
+	//}
+	//else
+	//{
+	//	rgba = glm::vec4(_sceneData->at(objectIndex)->BRDF());
+	//	return true;
+	//}
+}
+
+void Ray::Reflection(glm::vec3 _origin, glm::vec3 _direction, std::vector<Mesh*>* _sceneData)
+{
+	/*
+	Step 1: Integrate the PDF, which gives the cumulative distribution
+	function cfd(x) = int p(x) dx.
+	Step 2 : Invert y = cfd(x) <=> x = cfd-1(y). (linear for lambertian)
+	Step 3 : Calculate random numbers yi using a random number generator
+	with a uniform PDF p(y) = 1 on 0 <= y <= 1.
+	Step 4 : Map the uniform random numbers onto random numbers with
+	the p(x) using xi = cfd-1(yi)	The BRDF fr(x, omega_in, omega_out) can in principle enter the probability
+	distribution function, but it may not result in an invertible CDF.	use the remaining term p(theta, phi) = pi^-1 * cos(theta)	Inverted: azimuth phi_i = 2pi*u1 and the elevation thetai = acos(sqrt(u2)), u1, u2 pair of random numbers [0, 1].	*/	// Lambertian - linear pfd = cfd doesnt matter
+
+	glm::vec3 newDirection = _direction; //dependant on BRDF
+
+	Ray(_origin, newDirection, this, _sceneData);
 }
 
 void Ray::Transmision()
 {
-
 }
 
 glm::vec4 Ray::evaluate()
