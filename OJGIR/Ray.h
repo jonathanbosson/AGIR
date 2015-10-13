@@ -19,7 +19,7 @@ public:
 	void Reflection();
 	void Transmision();
 
-	glm::vec4 evaluate(){ return rgba; };
+	glm::vec4 evaluate();
 
 private:
 

@@ -96,6 +96,7 @@ void Ray::Intersection(glm::vec3 _origin, glm::vec3 _direction, std::vector<Mesh
 								//triangleIndex = j;??
 								nearestHit = glm::length(nDirection*t);
 								hit = nOrigin + nDirection*t;
+								rgba = glm::vec4(_sceneData->at(objectIndex)->BRDF());
 							}
 						}
 					}
@@ -104,8 +105,8 @@ void Ray::Intersection(glm::vec3 _origin, glm::vec3 _direction, std::vector<Mesh
 		}
 	}
 	
-	Reflection();
-	rgba = glm::vec4(_sceneData->at(objectIndex)->BRDF());
+	//Reflection();
+	//rgba = glm::vec4(_sceneData->at(objectIndex)->BRDF());
 }
 
 

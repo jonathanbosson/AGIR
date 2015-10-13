@@ -232,6 +232,7 @@ Temporary Items
 *.o
 *.obj
 *.db
+*.bmp
 
 # Precompiled Headers
 *.gch
