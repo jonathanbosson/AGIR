@@ -18,6 +18,7 @@ Ray::Ray(glm::vec3 _origin, glm::vec3 _direction, Ray* _parent, std::vector<Mesh
 	parent = _parent;
 
 	sceneObjects = _sceneData;
+	objectIndex = -1;
 
 	Intersection(origin, direction);
 }
@@ -98,10 +99,8 @@ void Ray::Intersection(glm::vec3 _origin, glm::vec3 _direction)
 							{
 								objectIndex = i;
 								hitNormal = glm::cross(eVec1, eVec2);
-								//triangleIndex = j;??
 								nearestHit = glm::length(nDirection*t);
 								hit = nOrigin + nDirection*t;
-								//rgb = sceneObjects->at(objectIndex)->BRDF();
 							}
 						}
 					}
@@ -109,13 +108,11 @@ void Ray::Intersection(glm::vec3 _origin, glm::vec3 _direction)
 			}
 		}
 	}
-
+	if (objectIndex == -1) //if no intersection found
+		return;
 	//-< Ray Termination >-------------------------------------------------------------------------------
 
 	// random value [0, 1]
-	//float u1 = fmod(rand(), 1);
-	//float u2 = fmod(rand(), 1);
-
 	float u1 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);;
 	float u2 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);;
 
@@ -127,18 +124,7 @@ void Ray::Intersection(glm::vec3 _origin, glm::vec3 _direction)
 	float rP = sceneObjects->at(objectIndex)->getP();
 
 	if (u1 > rP) //-< terminate ray path >--------------------------------------------------------------------------
-	{	
-		glm::vec3 L = glm::vec3(0.0f);
-		Ray* current = this;
-
-		while (current->parent != nullptr)
-		{
-			L = sceneObjects->at(objectIndex)->getLightEmission() + ((float)M_PI / rP)*sceneObjects->at(objectIndex)->BRDF()*L;
-			current = current->parent;
-		}
-		 
-		current->rgb = sceneObjects->at(objectIndex)->getLightEmission() + ((float)M_PI / rP)*sceneObjects->at(objectIndex)->BRDF()*L;
-	} 
+		return;
 	else //-< continue ray path >--------------------------------------------------------------------------
 	{
 		float randPhi = 2 * M_PI*u1;
@@ -146,10 +132,9 @@ void Ray::Intersection(glm::vec3 _origin, glm::vec3 _direction)
 		//glm::vec3 rDirection = glm::vec3(cos(randPhi)*sin(randTheta), sin(randPhi)*cos(randTheta), cos(randTheta));
 		glm::vec3 worldNormal = glm::mat3(sceneObjects->at(objectIndex)->getOrientation())*hitNormal;
 
-		//look into choosing a better upNormal
-		glm::vec3 upNormal = glm::vec3(worldNormal.x + 1.0f, worldNormal.y, worldNormal.z);
-		//glm::vec3 upNormal = worldNormal;  upNormal.x += 1.0f;
-		if (upNormal.x < EPSILON) upNormal.x += 1.f;
+		glm::vec3 upNormal = glm::vec3(0.0f, 1.0f, 1.0f);
+		//if (glm::dot(worldNormal, upNormal) <= EPSILON)
+		//	glm::vec3 upNormal = glm::vec3(0.0f, 0.0f, 0.8f);
 
 		glm::vec3 normalOrtho = glm::cross(worldNormal, upNormal);
 		normalOrtho = glm::rotate(normalOrtho, randPhi, worldNormal);
@@ -167,5 +152,17 @@ void Ray::Transmision()
 
 glm::vec3 Ray::evaluate()
 {
-	return rgb;
+	if (rChild && !tChild)
+		return sceneObjects->at(objectIndex)->getLightEmission() + ((float)M_PI / sceneObjects->at(objectIndex)->getP())*sceneObjects->at(objectIndex)->BRDF()*(rChild->evaluate());
+
+	if (rChild && tChild)
+		return sceneObjects->at(objectIndex)->getLightEmission() + ((float)M_PI / sceneObjects->at(objectIndex)->getP())*sceneObjects->at(objectIndex)->BRDF()*(rChild->evaluate() + tChild->evaluate());
+
+	if (tChild)
+		return sceneObjects->at(objectIndex)->getLightEmission() + ((float)M_PI / sceneObjects->at(objectIndex)->getP())*sceneObjects->at(objectIndex)->BRDF()*(tChild->evaluate());
+
+	if (objectIndex != -1)
+		return sceneObjects->at(objectIndex)->getLightEmission() + ((float)M_PI / sceneObjects->at(objectIndex)->getP())*sceneObjects->at(objectIndex)->BRDF()*(glm::vec3(0.0f, 0.0f, 0.0f));
+	else // no intersection
+		return glm::vec3(0.0f, 0.0f, 0.0f);
 }

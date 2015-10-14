@@ -22,6 +22,8 @@ public:
 
 	glm::vec3 evaluate();
 
+	glm::vec3 rgb;
+
 private:
 
 	glm::vec3 direction;
@@ -29,7 +31,7 @@ private:
 	glm::vec3 origin;
 	glm::vec3 hit;
 	glm::vec3 hitNormal;
-	glm::vec3 rgb;
+	
 
 	int objectIndex;
 	int triangleIndex;

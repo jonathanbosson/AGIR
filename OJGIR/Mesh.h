@@ -65,6 +65,8 @@ protected:
 	glm::vec3 position;
 	glm::mat4 orientation;
 
+	glm::mat4 modelMat;
+
 	GLuint vao;          // Vertex array object, the main handle for geometry
 	GLuint vertexbuffer; // Buffer ID to bind to GL_ARRAY_BUFFER
 	GLuint indexbuffer;  // Buffer ID to bind to GL_ELEMENT_ARRAY_BUFFER
