@@ -39,8 +39,9 @@ public:
 																							}
 	void setOrientation(glm::mat4 o) {orientation = o;// std::copy(o, o + 16, orientation); 
 																							}
-	float BRDF() { return testBRDF; }
+	glm::vec3 BRDF() { return testBRDF; }
 	float getP() { return P; }
+	glm::vec3 getLightEmission() { return lightEmission; };
 
 	vertex* getVarray(){ return vertexArray; }
 	triangle* getTarray(){ return indexArray; }
@@ -69,8 +70,8 @@ protected:
 	GLuint indexbuffer;  // Buffer ID to bind to GL_ELEMENT_ARRAY_BUFFER
 
 	//shading variables
-	float lightEmission;
-	float testBRDF;
+	glm::vec3 lightEmission;
+	glm::vec3 testBRDF;
 	float P;
 };
 

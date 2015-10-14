@@ -9,8 +9,8 @@ Cuboid::Cuboid(float x, float y, float z, float dX, float dY, float dZ, float _l
 	dim[1] = dY;
 	dim[2] = dZ;
 
-	testBRDF = _BRDF;
-	lightEmission = _light;
+	testBRDF = glm::vec3(_BRDF);
+	lightEmission = glm::vec3(_light);
 	P = 0.5;
 
 	orientation = glm::mat4(1.0f);

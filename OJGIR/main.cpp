@@ -26,15 +26,17 @@ int main()
 	Camera cam(glm::vec3(0.05f, 1.5f, 0.0f), glm::vec3(0.05f, 1.5f, - 1.0f));
 
 	std::vector<Mesh*>* scene = new std::vector<Mesh*>;
-	scene->push_back(new Cuboid(0.0f, 2.5f, -2.0f, 0.2f, 0.2f, 0.2f, 0.5f, 0.5f));
-	scene->push_back(new Cuboid(1.0f, 1.0f, -2.0f, 0.2f, 0.2f, 0.2f, 0.0f, 0.5f));
-	scene->push_back(new Cuboid(-1.0f, 1.5f, -2.0f, 0.2f, 0.2f, 0.2f, 0.0f, 0.5f));
+	scene->push_back(new Cuboid(0.0f, 2.5f, -2.0f, 0.2f, 0.2f, 0.2f, 0.5f, 0.1f));
+	scene->push_back(new Cuboid(1.0f, 1.0f, -2.0f, 0.2f, 0.2f, 0.2f, 0.0f, 0.1f));
+	scene->push_back(new Cuboid(-1.0f, 1.5f, -2.0f, 0.2f, 0.2f, 0.2f, 0.0f, 0.1f));
 
-	scene->push_back(new Cuboid(0.0f, 0.0f, 0.0f, 5.0f, 5.0f, 5.0f, 0.0f, 0.5f));
+	//scene->push_back(new Cuboid(0.0f, 0.0f, 0.0f, 5.0f, 5.0f, 5.0f, 0.0f, 0.1f));
 	
 	std::cout << "Rendering started...\n";
 	std::cout << "Image Dimensions: " << imgTest.x << "x" << imgTest.y << std::endl;
 	clock_t begin = clock();
+
+	srand(static_cast <unsigned> (time(0)));
 
 	Ray* rIt;
 	float x = (float) imgTest.x / (float) imgTest.y; 
@@ -57,7 +59,6 @@ int main()
 			glm::vec3 rPos = glm::vec3(cam.getCTransform() * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
 
 			rIt = new Ray(rPos, rDirection, nullptr, scene);
-
 			imgTest.imgData[i][j] = glm::vec3(rIt->evaluate());
 
 			delete rIt;

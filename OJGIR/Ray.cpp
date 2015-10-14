@@ -17,20 +17,21 @@ Ray::Ray(glm::vec3 _origin, glm::vec3 _direction, Ray* _parent, std::vector<Mesh
 	direction = _direction;
 	parent = _parent;
 
-	rgba = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
+	sceneObjects = _sceneData;
 
-	Intersection(origin, direction, _sceneData);
+	Intersection(origin, direction);
 }
 
 
 Ray::~Ray()
 {
-	delete parent;
 	delete rChild;
 	delete tChild;
+
+	//delete parent;
 }
 
-void Ray::Intersection(glm::vec3 _origin, glm::vec3 _direction, std::vector<Mesh*>* _sceneData)
+void Ray::Intersection(glm::vec3 _origin, glm::vec3 _direction)
 {
 	vertex* vertexArray;
 	int vertNr;
@@ -52,16 +53,16 @@ void Ray::Intersection(glm::vec3 _origin, glm::vec3 _direction, std::vector<Mesh
 
 	//-< search sceneobjects for ray intersection >------------------------------------------------
 
-	for (int i = 0; i < _sceneData->size(); i++)
+	for (int i = 0; i < sceneObjects->size(); i++)
 	{
 		//ray in model coordinates
-		nOrigin = glm::vec3(glm::transpose(_sceneData->at(i)->getOrientation()) * glm::vec4(_origin - _sceneData->at(i)->getPosition(), 1.0f));
-		nDirection = glm::vec3(glm::transpose(_sceneData->at(i)->getOrientation()) * glm::vec4(_direction, 1.0f));
+		nOrigin = glm::vec3(glm::transpose(sceneObjects->at(i)->getOrientation()) * glm::vec4(_origin - sceneObjects->at(i)->getPosition(), 1.0f));
+		nDirection = glm::vec3(glm::transpose(sceneObjects->at(i)->getOrientation()) * glm::vec4(_direction, 1.0f));
 
-		vertexArray = _sceneData->at(i)->getVarray();
-		vertNr = _sceneData->at(i)->getVertNr();
-		triangleArray = _sceneData->at(i)->getTarray();
-		triNr = _sceneData->at(i)->getTriNr();
+		vertexArray = sceneObjects->at(i)->getVarray();
+		vertNr = sceneObjects->at(i)->getVertNr();
+		triangleArray = sceneObjects->at(i)->getTarray();
+		triNr = sceneObjects->at(i)->getTriNr();
 
 		for (int j = 0; j < triNr; j++) {
 
@@ -100,7 +101,7 @@ void Ray::Intersection(glm::vec3 _origin, glm::vec3 _direction, std::vector<Mesh
 								//triangleIndex = j;??
 								nearestHit = glm::length(nDirection*t);
 								hit = nOrigin + nDirection*t;
-								rgba = glm::vec4(_sceneData->at(objectIndex)->BRDF());
+								//rgb = sceneObjects->at(objectIndex)->BRDF();
 							}
 						}
 					}
@@ -112,34 +113,50 @@ void Ray::Intersection(glm::vec3 _origin, glm::vec3 _direction, std::vector<Mesh
 	//-< Ray Termination >-------------------------------------------------------------------------------
 
 	// random value [0, 1]
-	float u1 = fmod(rand(), 1);
-	float u2 = fmod(rand(), 1);
+	//float u1 = fmod(rand(), 1);
+	//float u2 = fmod(rand(), 1);
 
-	//russian roulette
+	float u1 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);;
+	float u2 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);;
+
+
 	//float cosT = glm::dot(glm::normalize(hitNormal), glm::normalize(nDirection)); // = cos(theta)
 	//float p = (1 / M_PI) * cosT; // probability function p(phi, theta)
 	// cfd F(phi) = phi/(2*M_PI); //integral of p from -inf to x
 
-	if (u1 > _sceneData->at(objectIndex)->getP()) //terminate
+	float rP = sceneObjects->at(objectIndex)->getP();
+
+	if (u1 > rP) //-< terminate ray path >--------------------------------------------------------------------------
+	{	
+		glm::vec3 L = glm::vec3(0.0f);
+		Ray* current = this;
+
+		while (current->parent != nullptr)
+		{
+			L = sceneObjects->at(objectIndex)->getLightEmission() + ((float)M_PI / rP)*sceneObjects->at(objectIndex)->BRDF()*L;
+			current = current->parent;
+		}
+		 
+		current->rgb = sceneObjects->at(objectIndex)->getLightEmission() + ((float)M_PI / rP)*sceneObjects->at(objectIndex)->BRDF()*L;
+	} 
+	else //-< continue ray path >--------------------------------------------------------------------------
 	{
-		//evaluate E(<I>) = I / refProb
-		//shadowray
-		//rgba = glm::vec4(_sceneData->at(objectIndex)->BRDF());
-	}
-	else
-	{
-		float randPhi = 2 * M_PI*u1;	// random value xi (per intersection)
+		float randPhi = 2 * M_PI*u1;
 		float randTheta = acos(sqrt(u2));
 		//glm::vec3 rDirection = glm::vec3(cos(randPhi)*sin(randTheta), sin(randPhi)*cos(randTheta), cos(randTheta));
-		glm::vec3 worldNormal = glm::mat3(_sceneData->at(objectIndex)->getOrientation())*hitNormal;
+		glm::vec3 worldNormal = glm::mat3(sceneObjects->at(objectIndex)->getOrientation())*hitNormal;
 
 		//look into choosing a better upNormal
-		glm::vec3 normalOrtho = glm::cross(worldNormal, glm::vec3(1.0f, 0.0f, 0.0f));
+		glm::vec3 upNormal = glm::vec3(worldNormal.x + 1.0f, worldNormal.y, worldNormal.z);
+		//glm::vec3 upNormal = worldNormal;  upNormal.x += 1.0f;
+		if (upNormal.x < EPSILON) upNormal.x += 1.f;
+
+		glm::vec3 normalOrtho = glm::cross(worldNormal, upNormal);
 		normalOrtho = glm::rotate(normalOrtho, randPhi, worldNormal);
 
 		glm::vec3 rDirection = glm::rotate(worldNormal, randTheta, normalOrtho);
 
-		rChild = new Ray(glm::mat3(_sceneData->at(objectIndex)->getOrientation())*(hit + _sceneData->at(objectIndex)->getPosition()), rDirection, this, _sceneData);
+		rChild = new Ray(glm::mat3(sceneObjects->at(objectIndex)->getOrientation())*(hit + sceneObjects->at(objectIndex)->getPosition()), rDirection, this, sceneObjects);
 		// if (transparent) Transmission();
 	}
 }
@@ -148,7 +165,7 @@ void Ray::Transmision()
 {
 }
 
-glm::vec4 Ray::evaluate()
+glm::vec3 Ray::evaluate()
 {
-	return rgba;
+	return rgb;
 }

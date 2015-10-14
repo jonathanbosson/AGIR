@@ -15,12 +15,12 @@ public:
 
 	~Ray();
 
-	void Intersection(glm::vec3 _origin, glm::vec3 _direction, std::vector<Mesh*>* _sceneData);
-	void Reflection(std::vector<Mesh*>* _sceneData, float _u1, float _u2);
+	void Intersection(glm::vec3 _origin, glm::vec3 _direction);
+	void Reflection( float _u1, float _u2);
 	void Transmision();
 	
 
-	glm::vec4 evaluate();
+	glm::vec3 evaluate();
 
 private:
 
@@ -29,7 +29,7 @@ private:
 	glm::vec3 origin;
 	glm::vec3 hit;
 	glm::vec3 hitNormal;
-	glm::vec4 rgba;
+	glm::vec3 rgb;
 
 	int objectIndex;
 	int triangleIndex;
@@ -37,6 +37,8 @@ private:
 	Ray* parent;
 	Ray* tChild;
 	Ray* rChild;
+
+	std::vector<Mesh*>* sceneObjects;
 
 };
 
