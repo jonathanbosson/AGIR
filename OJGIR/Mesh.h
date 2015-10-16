@@ -39,7 +39,7 @@ public:
 																							}
 	void setOrientation(glm::mat4 o) {orientation = o;// std::copy(o, o + 16, orientation); 
 																							}
-	glm::vec3 BRDF() { return testBRDF; }
+	glm::vec3 BRDF() { return brdf; }
 	float getP() { return P; }
 	glm::vec3 getLightEmission() { return lightEmission; };
 
@@ -73,7 +73,7 @@ protected:
 
 	//shading variables
 	glm::vec3 lightEmission;
-	glm::vec3 testBRDF;
+	glm::vec3 brdf;
 	float P;
 };
 

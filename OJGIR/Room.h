@@ -27,7 +27,7 @@ public:
 		nTris = 0;
 	};
 
-	Room(float x, float y, float z, float dX, float dY, float dZ, float light, float tBRDF);
+	Room(glm::vec3 _pos, glm::vec3 _dim, glm::vec3 _emission, glm::vec3 _brdf, float _P);
 
 	void createBuffers();
 	~Room();

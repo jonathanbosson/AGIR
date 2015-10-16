@@ -1,47 +1,47 @@
 #include "Room.h"
 
 
-Room::Room(float x, float y, float z, float dX, float dY, float dZ, float _light, float _BRDF) {
-	position[0] = x;
-	position[1] = y;
-	position[2] = z;
-	dim[0] = dX;
-	dim[1] = dY;
-	dim[2] = dZ;
+Room::Room(glm::vec3 _pos, glm::vec3 _dim, glm::vec3 _emission, glm::vec3 _brdf, float _P) {
+	position[0] = _pos.x;
+	position[1] = _pos.y;
+	position[2] = _pos.z;
+	dim[0] = _dim.x;
+	dim[1] = _dim.y;
+	dim[2] = _dim.z;
 
-	testBRDF = glm::vec3(_BRDF);
-	lightEmission = glm::vec3(_light);
-	P = 0.3f;
+	brdf = _brdf;
+	lightEmission = _emission;
+	P = _P;
 
 	orientation = glm::mat4(1.0f);
 
 	GLfloat vertex_array_data[] = {
-		-dX / 2.0f, -dY / 2.0f, dZ / 2.0f, 0.0f, 0.0f, 1.0f,  //1 - 0
-		dX / 2.0f, -dY / 2.0f, dZ / 2.0f, 0.0f, 0.0f, 1.0f, //2 - 1
-		dX / 2.0f, dY / 2.0f, dZ / 2.0f, 0.0f, 0.0f, 1.0f,   //3 - 2
-		-dX / 2.0f, dY / 2.0f, dZ / 2.0f, 0.0f, 0.0f, 1.0f,  //4 - 3 
-		-dX / 2.0f, -dY / 2.0f, -dZ / 2.0f, 0.0f, 0.0f, -1.0f, //5 - 4 
-		dX / 2.0f, -dY / 2.0f, -dZ / 2.0f, 0.0f, 0.0f, -1.0f, //6 - 5
-		dX / 2.0f, dY / 2.0f, -dZ / 2.0f, 0.0f, 0.0f, -1.0f,  //7 - 6 
-		-dX / 2.0f, dY / 2.0f, -dZ / 2.0f, 0.0f, 0.0f, -1.0f, //8 - 7
+		-_dim.x / 2.0f, -_dim.y / 2.0f, _dim.z / 2.0f, 0.0f, 0.0f, 1.0f,  //1 - 0
+		_dim.x / 2.0f, -_dim.y / 2.0f, _dim.z / 2.0f, 0.0f, 0.0f, 1.0f, //2 - 1
+		_dim.x / 2.0f, _dim.y / 2.0f, _dim.z / 2.0f, 0.0f, 0.0f, 1.0f,   //3 - 2
+		-_dim.x / 2.0f, _dim.y / 2.0f, _dim.z / 2.0f, 0.0f, 0.0f, 1.0f,  //4 - 3 
+		-_dim.x / 2.0f, -_dim.y / 2.0f, -_dim.z / 2.0f, 0.0f, 0.0f, -1.0f, //5 - 4 
+		_dim.x / 2.0f, -_dim.y / 2.0f, -_dim.z / 2.0f, 0.0f, 0.0f, -1.0f, //6 - 5
+		_dim.x / 2.0f, _dim.y / 2.0f, -_dim.z / 2.0f, 0.0f, 0.0f, -1.0f,  //7 - 6 
+		-_dim.x / 2.0f, _dim.y / 2.0f, -_dim.z / 2.0f, 0.0f, 0.0f, -1.0f, //8 - 7
 
-		-dX / 2.0f, -dY / 2.0f, dZ / 2.0f, -1.0f, 0.0f, 0.0f, //1 - 8
-		dX / 2.0f, -dY / 2.0f, dZ / 2.0f, -1.0f, 0.0f, 0.0f,  //2 - 9
-		dX / 2.0f, dY / 2.0f, dZ / 2.0f, 1.0f, 0.0f, 0.0f,   //3 - 10
-		-dX / 2.0f, dY / 2.0f, dZ / 2.0f, 1.0f, 0.0f, 0.0f,  //4 - 11
-		-dX / 2.0f, -dY / 2.0f, -dZ / 2.0f, -1.0f, 0.0f, 0.0f, //5 - 12
-		dX / 2.0f, -dY / 2.0f, -dZ / 2.0f, -1.0f, 0.0f, 0.0f, //6 - 13
-		dX / 2.0f, dY / 2.0f, -dZ / 2.0f, 1.0f, 0.0f, 0.0f,  //7 - 14
-		-dX / 2.0f, dY / 2.0f, -dZ / 2.0f, 1.0f, 0.0f, 0.0f,  //8 - 15
+		-_dim.x / 2.0f, -_dim.y / 2.0f, _dim.z / 2.0f, -1.0f, 0.0f, 0.0f, //1 - 8
+		_dim.x / 2.0f, -_dim.y / 2.0f, _dim.z / 2.0f, -1.0f, 0.0f, 0.0f,  //2 - 9
+		_dim.x / 2.0f, _dim.y / 2.0f, _dim.z / 2.0f, 1.0f, 0.0f, 0.0f,   //3 - 10
+		-_dim.x / 2.0f, _dim.y / 2.0f, _dim.z / 2.0f, 1.0f, 0.0f, 0.0f,  //4 - 11
+		-_dim.x / 2.0f, -_dim.y / 2.0f, -_dim.z / 2.0f, -1.0f, 0.0f, 0.0f, //5 - 12
+		_dim.x / 2.0f, -_dim.y / 2.0f, -_dim.z / 2.0f, -1.0f, 0.0f, 0.0f, //6 - 13
+		_dim.x / 2.0f, _dim.y / 2.0f, -_dim.z / 2.0f, 1.0f, 0.0f, 0.0f,  //7 - 14
+		-_dim.x / 2.0f, _dim.y / 2.0f, -_dim.z / 2.0f, 1.0f, 0.0f, 0.0f,  //8 - 15
 
-		-dX / 2.0f, -dY / 2.0f, dZ / 2.0f, 0.0f, -1.0f, 0.0f,  //1 - 16
-		dX / 2.0f, -dY / 2.0f, dZ / 2.0f, 0.0f, 1.0f, 0.0f,  //2 - 17
-		dX / 2.0f, dY / 2.0f, dZ / 2.0f, 0.0f, 1.0f, 0.0f,   //3 - 18
-		-dX / 2.0f, dY / 2.0f, dZ / 2.0f, 0.0f, -1.0f, 0.0f,  //4 - 19
-		-dX / 2.0f, -dY / 2.0f, -dZ / 2.0f, 0.0f, -1.0f, 0.0f, //5 - 20
-		dX / 2.0f, -dY / 2.0f, -dZ / 2.0f, 0.0f, 1.0f, 0.0f, //6 - 21
-		dX / 2.0f, dY / 2.0f, -dZ / 2.0f, 0.0f, 1.0f, 0.0f,  //7 - 22
-		-dX / 2.0f, dY / 2.0f, -dZ / 2.0f, 0.0f, -1.0f, 0.0f, //8 - 23
+		-_dim.x / 2.0f, -_dim.y / 2.0f, _dim.z / 2.0f, 0.0f, -1.0f, 0.0f,  //1 - 16
+		_dim.x / 2.0f, -_dim.y / 2.0f, _dim.z / 2.0f, 0.0f, 1.0f, 0.0f,  //2 - 17
+		_dim.x / 2.0f, _dim.y / 2.0f, _dim.z / 2.0f, 0.0f, 1.0f, 0.0f,   //3 - 18
+		-_dim.x / 2.0f, _dim.y / 2.0f, _dim.z / 2.0f, 0.0f, -1.0f, 0.0f,  //4 - 19
+		-_dim.x / 2.0f, -_dim.y / 2.0f, -_dim.z / 2.0f, 0.0f, -1.0f, 0.0f, //5 - 20
+		_dim.x / 2.0f, -_dim.y / 2.0f, -_dim.z / 2.0f, 0.0f, 1.0f, 0.0f, //6 - 21
+		_dim.x / 2.0f, _dim.y / 2.0f, -_dim.z / 2.0f, 0.0f, 1.0f, 0.0f,  //7 - 22
+		-_dim.x / 2.0f, _dim.y / 2.0f, -_dim.z / 2.0f, 0.0f, -1.0f, 0.0f, //8 - 23
 	};
 
 	static const GLuint index_array_data[] = {

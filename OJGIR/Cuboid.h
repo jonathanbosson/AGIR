@@ -27,7 +27,8 @@ public:
 		nTris = 0;
 	};
 
-	Cuboid(float x, float y, float z, float dX, float dY, float dZ, float light, float tBRDF);
+	//Cuboid(float x, float y, float z, float dX, float dY, float dZ, float light, float tBRDF);
+	Cuboid(glm::vec3 _pos, glm::vec3 _dim, glm::vec3 _emission, glm::vec3 _brdf, float _P);
 
 	void createBuffers();
 	~Cuboid();

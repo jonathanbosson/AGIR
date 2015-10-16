@@ -1,17 +1,18 @@
 #pragma once
 #include "Utilities.h"
 #include "Mesh.h"
+#include "RNG.h"
+
 #include <vector>
 
 class Ray
 {
 
-
 public:
 
 	Ray();
 
-	Ray(glm::vec3 _origin, glm::vec3 _direction, Ray* _parent, std::vector<Mesh*>* _sceneData);
+	Ray(glm::vec3 _origin, glm::vec3 _direction, Ray* _parent, std::vector<Mesh*>* _sceneData, RNG& _rng, glm::vec3 _W);
 
 	~Ray();
 
@@ -22,7 +23,7 @@ public:
 
 	glm::vec3 evaluate();
 
-	glm::vec3 rgb;
+	glm::vec3 W;
 
 private:
 
@@ -31,7 +32,6 @@ private:
 	glm::vec3 origin;
 	glm::vec3 hit;
 	glm::vec3 hitNormal;
-	
 
 	int objectIndex;
 	int triangleIndex;
@@ -41,6 +41,8 @@ private:
 	Ray* rChild;
 
 	std::vector<Mesh*>* sceneObjects;
+
+	RNG* rng;
 
 };
 
