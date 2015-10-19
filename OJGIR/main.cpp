@@ -128,7 +128,7 @@ int main()
 
 
 	while (true) {
-		std::cout << " ";
+ 		std::cout << " ";
 	}
 
 	return 0;
