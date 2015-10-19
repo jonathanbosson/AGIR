@@ -14,7 +14,7 @@ public:
 	int x;
 	int y;
 
-	glm::vec3** imgData;
+	glm::dvec3** imgData;
 
 private:
 

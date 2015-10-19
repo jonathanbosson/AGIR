@@ -27,7 +27,7 @@ public:
 		nTris = 0;
 	};
 
-	Room(glm::vec3 _pos, glm::vec3 _dim, glm::vec3 _emission, glm::vec3 _brdf, float _P);
+	Room(glm::dvec3 _pos, glm::dvec3 _dim, glm::dvec3 _emission, glm::dvec3 _brdf, double _P);
 
 	void createBuffers();
 	~Room();

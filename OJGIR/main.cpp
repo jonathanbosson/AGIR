@@ -29,28 +29,28 @@ int main()
 {
 	Image imgTest(512, 512 );
 
-	Camera cam(glm::vec3(0.05f, 0.0f, 0.74f), glm::vec3(0.05f, 0.0f, - 1.0f));
+	Camera cam(glm::dvec3(0.05, 0.0, 0.74), glm::dvec3(0.05, 0.0, - 1.0));
 
 	std::vector<Mesh*>* scene = new std::vector<Mesh*>;
 	//light
-	scene->push_back(new Cuboid(glm::vec3(0.0f, 0.5f, -0.5f),	//position
-		glm::vec3(0.2f, 0.2f, 0.2f),							//dimension
-		glm::vec3(0.0f, 100.0f, 100.0f),						//emission
-		glm::vec3(0.0f, 0.0f, 0.0f), 0.01f));					//brdf and P
+	scene->push_back(new Cuboid(glm::dvec3(0.0, 0.5, -0.5),	//position
+		glm::dvec3(0.2, 0.2, 0.2),							//dimension
+		glm::dvec3(0.0, 100.0, 100.0),						//emission
+		glm::dvec3(0.0, 0.0, 0.0), 0.01));					//brdf and P
 	//objects
-	scene->push_back(new Cuboid(glm::vec3(0.6f, 0.5f, -0.5f), 
-		glm::vec3(0.2f, 0.2f, 0.2f), 
-		glm::vec3(0.0f, 0.0f, 0.0f),
-		glm::vec3(0.1f, 0.0f, 0.0f), 0.6f));
-	scene->push_back(new Cuboid(glm::vec3(-0.5f, 0.5f, -0.0f),
-		glm::vec3(0.2f, 0.2f, 0.2f), 
-		glm::vec3(0.0f, 0.0f, 0.0f),
-		glm::vec3(0.0f, 0.1f, 0.1f), 0.6f));
+	scene->push_back(new Cuboid(glm::dvec3(0.6, 0.5, -0.5), 
+		glm::dvec3(0.2, 0.2, 0.2), 
+		glm::dvec3(0.0, 0.0, 0.0),
+		glm::dvec3(0.1, 0.0, 0.0), 0.6));
+	scene->push_back(new Cuboid(glm::dvec3(-0.5, 0.5, -0.0),
+		glm::dvec3(0.2, 0.2, 0.2), 
+		glm::dvec3(0.0, 0.0, 0.0),
+		glm::dvec3(0.0, 0.1, 0.1), 0.6f));
 	//room
-	scene->push_back(new Room(glm::vec3(0.0f, 0.0f, 0.0f), 
-		glm::vec3(1.5f, 1.5f, 1.5f), 
-		glm::vec3(0.0f, 0.0f, 0.0f), 
-		glm::vec3(0.0f, 0.0f, 0.1f), 0.3f));
+	scene->push_back(new Room(glm::vec3(0.0, 0.0, 0.0), 
+		glm::vec3(1.5, 1.5, 1.5), 
+		glm::vec3(0.0, 0.0, 0.0), 
+		glm::vec3(0.0, 0.0, 0.1), 0.3));
 	
 	std::cout << "Rendering started...\n";
 	std::cout << "Image Dimensions: " << imgTest.x << "x" << imgTest.y << std::endl;
@@ -60,23 +60,23 @@ int main()
 	//start rendering--------------------------------------------------------------
 	//seed random numbers
 	//srand(static_cast <unsigned> (time(0)));
-	std::uniform_real_distribution<float> distribution(0.0, 1.0f);
+	std::uniform_real_distribution<float> distribution(0.0, 1.0);
 	std::default_random_engine generator;
 
 	Ray* rIt;
-	float x = (float) imgTest.x / (float) imgTest.y; 
-	float y = 1.0f;//(float) imgTest.y / (float) imgTest.x;
-	float xCo = -x;
-	float yCo = -y;
-	float rX; float rY;
-	float maxI = 0.0f;
-	float tmpFloat;
+	double x = (double) imgTest.x / (double) imgTest.y; 
+	double y = 1.0;//(float) imgTest.y / (float) imgTest.x;
+	double xCo = -x;
+	double yCo = -y;
+	double rX; double rY;
+	double maxI = 0.0;
+	double tmpFloat;
 
 	RNG rng;
 
-	float xStep = (2* x) / imgTest.x;
-	float yStep = (2* y) / imgTest.y;
-	glm::vec3 tempRGB;
+	double xStep = (2* x) / (double)imgTest.x;
+	double yStep = (2* y) / (double)imgTest.y;
+	glm::dvec3 tempRGB;
 	//yStep = xStep;
 	for (int i = 0; i < imgTest.y; i++)//173
 	{
@@ -85,22 +85,22 @@ int main()
 		for (int j = 0; j < imgTest.x; j++)//374
 		{
 			xCo += xStep;
-			tempRGB = glm::vec3(0.0f, 0.0f, 0.0f);
+			tempRGB = glm::dvec3(0.0, 0.0, 0.0);
 			for (int p = 0; p < 10; p++)
 			{
 				rX = rng.dist(rng.mt) * xStep;
 				rY = rng.dist(rng.mt) * yStep;
 
-				glm::vec3 rDirection = glm::mat3(cam.getCTransform()) * (glm::vec3(xCo+rX, yCo+rY, -1.0f));
-				glm::vec3 rPos = glm::vec3(cam.getCTransform() * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+				glm::dvec3 rDirection = glm::dmat3(cam.getCTransform()) * (glm::dvec3(xCo+rX, yCo+rY, -1.0));
+				glm::dvec3 rPos = glm::dvec3(cam.getCTransform() * glm::dvec4(0.0, 0.0, 0.0, 1.0));
 
-				rIt = new Ray(rPos, rDirection, nullptr, scene, rng, glm::vec3(1.0f));
+				rIt = new Ray(rPos, rDirection, nullptr, scene, rng, glm::dvec3(1.0));
 				tempRGB += rIt->evaluate();
 
 				delete rIt;
 			}
 
-			imgTest.imgData[i][j] = tempRGB / 10.0f;
+			imgTest.imgData[i][j] = tempRGB / 10.0;
 
 			//find max pixel value in image
 			tmpFloat = std::max(std::max(imgTest.imgData[i][j].x, imgTest.imgData[i][j].y), imgTest.imgData[i][j].z);

@@ -12,7 +12,7 @@ public:
 
 	Ray();
 
-	Ray(glm::vec3 _origin, glm::vec3 _direction, Ray* _parent, std::vector<Mesh*>* _sceneData, RNG& _rng, glm::vec3 _W);
+	Ray(glm::dvec3 _origin, glm::dvec3 _direction, Ray* _parent, std::vector<Mesh*>* _sceneData, RNG& _rng, glm::vec3 _W);
 
 	~Ray();
 
@@ -21,17 +21,17 @@ public:
 	void Transmision();
 	
 
-	glm::vec3 evaluate();
+	glm::dvec3 evaluate();
 
-	glm::vec3 W;
+	glm::dvec3 W;
 
 private:
 
-	glm::vec3 direction;
+	glm::dvec3 direction;
 	
-	glm::vec3 origin;
-	glm::vec3 hit;
-	glm::vec3 hitNormal;
+	glm::dvec3 origin;
+	glm::dvec3 hit;
+	glm::dvec3 hitNormal;
 
 	int objectIndex;
 	int triangleIndex;

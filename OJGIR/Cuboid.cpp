@@ -1,6 +1,6 @@
 #include "Cuboid.h"
 
-Cuboid::Cuboid(glm::vec3 _pos, glm::vec3 _dim, glm::vec3 _emission, glm::vec3 _brdf, float _P) 
+Cuboid::Cuboid(glm::dvec3 _pos, glm::dvec3 _dim, glm::dvec3 _emission, glm::dvec3 _brdf, double _P) 
 {
 	position[0] = _pos.x;
 	position[1] = _pos.y;
@@ -13,7 +13,7 @@ Cuboid::Cuboid(glm::vec3 _pos, glm::vec3 _dim, glm::vec3 _emission, glm::vec3 _b
 	lightEmission = _emission;
 	P = _P;
 
-	orientation = glm::mat4(1.0f);
+	orientation = glm::dmat4(1.0);
 
 
 	modelMat = orientation * glm::translate(position);

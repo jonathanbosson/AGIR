@@ -3,9 +3,9 @@
 #include <math.h>
 //#include "main.cpp"
 
-#define EPSILON  0.000000001f // 5 nollor
-#define M_PI  3.14159265358979323846f
-#define INF 9999999999.0f
+const double EPSILON = 0.0000000001; // 5 nollor
+#define M_PI  3.14159265358979323846
+#define INF 9999999999.0
 
 Ray::Ray()
 {
@@ -14,7 +14,7 @@ Ray::Ray()
 	tChild = nullptr;
 }
 
-Ray::Ray(glm::vec3 _origin, glm::vec3 _direction, Ray* _parent, std::vector<Mesh*>* _sceneData, RNG& _rng, glm::vec3 _W)
+Ray::Ray(glm::dvec3 _origin, glm::dvec3 _direction, Ray* _parent, std::vector<Mesh*>* _sceneData, RNG& _rng, glm::vec3 _W)
 {
 	origin = _origin;
 	direction = _direction;
@@ -32,24 +32,24 @@ Ray::Ray(glm::vec3 _origin, glm::vec3 _direction, Ray* _parent, std::vector<Mesh
 	triangle* triangleArray;
 	int triNr;
 
-	glm::vec3 nOrigin;
-	glm::vec3 nDirection;
+	glm::dvec3 nOrigin;
+	glm::dvec3 nDirection;
 
-	glm::vec3 eVec1; glm::vec3 feVec1;
-	glm::vec3 eVec2; glm::vec3 feVec2;
-	glm::vec3 P; glm::vec3 Q; glm::vec3 T;
+	glm::dvec3 eVec1; glm::dvec3 feVec1;
+	glm::dvec3 eVec2; glm::dvec3 feVec2;
+	glm::dvec3 P; glm::dvec3 Q; glm::dvec3 T;
 
-	float nearestHit = INF;
+	double nearestHit = INF;
 
-	float pLength;
-	float invP; float u; float v; float t;
+	double pLength;
+	double invP; double u; double v; double t;
 	float* temp1; float* temp2;
 
 	for (int i = 0; i < sceneObjects->size(); i++)
 	{
 		//ray in model coordinates
-		nOrigin = glm::vec3(glm::transpose(sceneObjects->at(i)->getOrientation()) * glm::vec4(_origin - sceneObjects->at(i)->getPosition(), 1.0f));
-		nDirection = glm::normalize(glm::vec3(glm::transpose(sceneObjects->at(i)->getOrientation()) * glm::vec4(_direction, 1.0f)));
+		nOrigin = glm::vec3(glm::transpose(sceneObjects->at(i)->getOrientation()) * glm::dvec4(_origin - sceneObjects->at(i)->getPosition(), 1.0));
+		nDirection = glm::normalize(glm::vec3(glm::transpose(sceneObjects->at(i)->getOrientation()) * glm::vec4(_direction, 1.0)));
 
 		vertexArray = sceneObjects->at(i)->getVarray();
 		vertNr = sceneObjects->at(i)->getVertNr();
@@ -60,28 +60,28 @@ Ray::Ray(glm::vec3 _origin, glm::vec3 _direction, Ray* _parent, std::vector<Mesh
 
 			temp1 = vertexArray[triangleArray[j].index[0]].xyz;
 			temp2 = vertexArray[triangleArray[j].index[1]].xyz;
-			eVec1 = glm::vec3(temp2[0], temp2[1], temp2[2]) - glm::vec3(temp1[0], temp1[1], temp1[2]);
+			eVec1 = glm::dvec3(temp2[0], temp2[1], temp2[2]) - glm::dvec3(temp1[0], temp1[1], temp1[2]);
 
 			temp2 = vertexArray[triangleArray[j].index[2]].xyz;
-			eVec2 = glm::vec3(temp2[0], temp2[1], temp2[2]) - glm::vec3(temp1[0], temp1[1], temp1[2]);
+			eVec2 = glm::dvec3(temp2[0], temp2[1], temp2[2]) - glm::dvec3(temp1[0], temp1[1], temp1[2]);
 
 			P = glm::cross(nDirection, eVec2);
 
 			pLength = glm::dot(eVec1, P);
 			if (pLength < -EPSILON || pLength > EPSILON)
 			{
-				invP = 1.f / pLength;
-				
-				T = nOrigin - glm::vec3(temp1[0], temp1[1], temp1[2]);
+				invP = 1.0 / pLength;
+
+				T = nOrigin - glm::dvec3(temp1[0], temp1[1], temp1[2]);
 
 				u = glm::dot(T, P) * invP;
-				if (u > 0.0f && u < 1.0f)
+				if (u > 0.0 && u < 1.0)
 				{
 					Q = glm::cross( T, eVec1);
 
 					v = glm::dot(nDirection, Q)*invP;
 
-					if (v > 0.0f && u + v < 1.0f)
+					if (v > 0.0 && u + v < 1.0)
 					{
 						t = glm::dot(eVec2, Q)*invP;
 						if (t > EPSILON)
@@ -103,13 +103,13 @@ Ray::Ray(glm::vec3 _origin, glm::vec3 _direction, Ray* _parent, std::vector<Mesh
 	if (objectIndex == -1) //if no intersection found
 		return;
 
-	hit = glm::mat3(sceneObjects->at(objectIndex)->getOrientation())*(hit) + (sceneObjects->at(objectIndex)->getPosition());
+	hit = glm::dmat3(sceneObjects->at(objectIndex)->getOrientation())*(hit) + (sceneObjects->at(objectIndex)->getPosition());
 	//hit = glm::vec3(sceneObjects->at(objectIndex)->getmodelMat()*glm::vec4(hit, 1.0f));
 	//-< Ray Termination >-------------------------------------------------------------------------------
 
 	// random value [0, 1]
-	float u1 = _rng.dist(_rng.mt);
-	float u2 = _rng.dist(_rng.mt);
+	double u1 = _rng.dist(_rng.mt);
+	double u2 = _rng.dist(_rng.mt);
 	//float cosT = glm::dot(glm::normalize(hitNormal), glm::normalize(nDirection)); // = cos(theta)
 	//float p = (1 / M_PI) * cosT; // probability function p(phi, theta)
 	// cfd F(phi) = phi/(2*M_PI); //integral of p from -inf to x
@@ -118,13 +118,13 @@ Ray::Ray(glm::vec3 _origin, glm::vec3 _direction, Ray* _parent, std::vector<Mesh
 		return;
 	else //-< continue ray path >--------------------------------------------------------------------------
 	{
-		float randPhi = 2 * M_PI*u1;
-		float randTheta = acos(sqrt(u2));
+		double randPhi = 2 * M_PI*u1;
+		double randTheta = acos(sqrt(u2));
 		//glm::vec3 rDirection = glm::vec3(cos(randPhi)*sin(randTheta), sin(randPhi)*cos(randTheta), cos(randTheta));		
-		glm::vec3 worldNormal = glm::mat3(sceneObjects->at(objectIndex)->getOrientation())*hitNormal;
-		
-		glm::vec3 upNormal = feVec1;//glm::vec3(1.0f, 1.0f, 1.0f);
-		glm::vec3 normalOrtho = glm::cross(worldNormal, upNormal);
+		glm::dvec3 worldNormal = glm::dmat3(sceneObjects->at(objectIndex)->getOrientation())*hitNormal;
+
+		glm::dvec3 upNormal = feVec1;//glm::vec3(1.0f, 1.0f, 1.0f);
+		glm::dvec3 normalOrtho = glm::cross(worldNormal, upNormal);
 
 		normalOrtho = glm::rotate(normalOrtho, randPhi, worldNormal);
 
@@ -142,7 +142,7 @@ Ray::~Ray()
 }
 
 
-glm::vec3 Ray::evaluate()
+glm::dvec3 Ray::evaluate()
 {
 	bool success;
 	bool shadowSuccess;
@@ -152,23 +152,23 @@ glm::vec3 Ray::evaluate()
 	triangle* triangleArray;
 	int triNr;
 
-	glm::vec3 nOrigin;
-	glm::vec3 nDirection;
+	glm::dvec3 nOrigin;
+	glm::dvec3 nDirection;
 
-	glm::vec3 eVec1;
-	glm::vec3 eVec2;
-	glm::vec3 P; glm::vec3 Q; glm::vec3 T;
+	glm::dvec3 eVec1;
+	glm::dvec3 eVec2;
+	glm::dvec3 P; glm::dvec3 Q; glm::dvec3 T;
 
 	//float nearestHit = INF;
 
-	float pLength;
-	float invP; float u; float v; float t;
+	double pLength;
+	double invP; double u; double v; double t;
 	float* temp1; float* temp2;
 
-	glm::vec3 shadowLight(0.0f, 0.0f, 0.0f);
-	float shadowLength;
-	glm::vec3 shadowBase  = sceneObjects->at(0)->getPosition() - hit;
-	glm::vec3 shadowDir;
+	glm::dvec3 shadowLight(0.0, 0.0, 0.0);
+	double shadowLength;
+	glm::dvec3 shadowBase  = sceneObjects->at(0)->getPosition() - hit;
+	glm::dvec3 shadowDir;
 	//shadowLength = glm::length(shadowBase) - 0.1f;
 
 	for(int i = 0; i < 1; i++)
@@ -181,8 +181,8 @@ glm::vec3 Ray::evaluate()
 		//nDirection = glm::normalize(glm::vec3(shadowBase.x+rX, shadowBase.y+rY, shadowBase.z+rZ));
 		shadowDir = glm::normalize(shadowBase);
 
-		nOrigin = glm::vec3(glm::transpose(sceneObjects->at(i)->getOrientation()) * glm::vec4(hit - sceneObjects->at(i)->getPosition(), 1.0f));
-		nDirection = glm::normalize(glm::vec3(glm::transpose(sceneObjects->at(i)->getOrientation()) * glm::vec4(shadowDir, 1.0f)));
+		nOrigin = glm::dvec3(glm::transpose(sceneObjects->at(i)->getOrientation()) * glm::dvec4(hit - sceneObjects->at(i)->getPosition(), 1.0f));
+		nDirection = glm::normalize(glm::dvec3(glm::transpose(sceneObjects->at(i)->getOrientation()) * glm::dvec4(shadowDir, 1.0f)));
 
 		success = true;
 		shadowSuccess = false;
@@ -199,28 +199,28 @@ glm::vec3 Ray::evaluate()
 
 			temp1 = vertexArray[triangleArray[j].index[0]].xyz;
 			temp2 = vertexArray[triangleArray[j].index[1]].xyz;
-			eVec1 = glm::vec3(temp2[0], temp2[1], temp2[2]) - glm::vec3(temp1[0], temp1[1], temp1[2]);
+			eVec1 = glm::dvec3(temp2[0], temp2[1], temp2[2]) - glm::dvec3(temp1[0], temp1[1], temp1[2]);
 
 			temp2 = vertexArray[triangleArray[j].index[2]].xyz;
-			eVec2 = glm::vec3(temp2[0], temp2[1], temp2[2]) - glm::vec3(temp1[0], temp1[1], temp1[2]);
+			eVec2 = glm::dvec3(temp2[0], temp2[1], temp2[2]) - glm::dvec3(temp1[0], temp1[1], temp1[2]);
 
 			P = glm::cross(nDirection, eVec2);
 
 			pLength = glm::dot(eVec1, P);
 			if (pLength < -EPSILON || pLength > EPSILON)
 			{
-				invP = 1.f / pLength;
+				invP = 1.0 / pLength;
 
-				T = nOrigin - glm::vec3(temp1[0], temp1[1], temp1[2]);
+				T = nOrigin - glm::dvec3(temp1[0], temp1[1], temp1[2]);
 
 				u = glm::dot(T, P) * invP;
-				if (u > 0.0f && u < 1.0f)
+				if (u > 0.0 && u < 1.0)
 				{
 					Q = glm::cross(T, eVec1);
 
 					v = glm::dot(nDirection, Q)*invP;
 
-					if (v > 0.0f && u + v < 1.0f)
+					if (v > 0.0 && u + v < 1.0)
 					{
 						t = glm::dot(eVec2, Q)*invP;
 						if (t > EPSILON)
@@ -239,8 +239,8 @@ glm::vec3 Ray::evaluate()
 		//search scene to see if any objects oclude the lightsource -------------------------------------------------------
 		for (int i = 1; i < sceneObjects->size(); i++)
 		{
-			nOrigin = glm::vec3(glm::transpose(sceneObjects->at(i)->getOrientation()) * glm::vec4(hit - sceneObjects->at(i)->getPosition(), 1.0f));
-			nDirection = glm::normalize(glm::vec3(glm::transpose(sceneObjects->at(i)->getOrientation()) * glm::vec4(shadowDir, 1.0f)));
+			nOrigin = glm::dvec3(glm::transpose(sceneObjects->at(i)->getOrientation()) * glm::dvec4(hit - sceneObjects->at(i)->getPosition(), 1.0));
+			nDirection = glm::normalize(glm::dvec3(glm::transpose(sceneObjects->at(i)->getOrientation()) * glm::dvec4(shadowDir, 1.0)));
 			//nOrigin = glm::vec3(glm::inverse(sceneObjects->at(i)->getmodelMat())* glm::vec4(hit, 1.0f));
 			//nDirection = glm::vec3(glm::inverse(sceneObjects->at(i)->getmodelMat())* glm::vec4(shadowDir, 1.0f));
 
@@ -253,28 +253,28 @@ glm::vec3 Ray::evaluate()
 
 				temp1 = vertexArray[triangleArray[j].index[0]].xyz;
 				temp2 = vertexArray[triangleArray[j].index[1]].xyz;
-				eVec1 = glm::vec3(temp2[0], temp2[1], temp2[2]) - glm::vec3(temp1[0], temp1[1], temp1[2]);
+				eVec1 = glm::dvec3(temp2[0], temp2[1], temp2[2]) - glm::dvec3(temp1[0], temp1[1], temp1[2]);
 
 				temp2 = vertexArray[triangleArray[j].index[2]].xyz;
-				eVec2 = glm::vec3(temp2[0], temp2[1], temp2[2]) - glm::vec3(temp1[0], temp1[1], temp1[2]);
+				eVec2 = glm::dvec3(temp2[0], temp2[1], temp2[2]) - glm::dvec3(temp1[0], temp1[1], temp1[2]);
 
 				P = glm::cross(nDirection, eVec2);
 
 				pLength = glm::dot(eVec1, P);
 				if (pLength < -EPSILON || pLength > EPSILON)
 				{
-					invP = 1.f / pLength;
-				
-					T = nOrigin - glm::vec3(temp1[0], temp1[1], temp1[2]);
+					invP = 1.0 / pLength;
+
+					T = nOrigin - glm::dvec3(temp1[0], temp1[1], temp1[2]);
 
 					u = glm::dot(T, P) * invP;
-					if (u > 0.0f && u < 1.0f)
+					if (u > 0.0 && u < 1.0)
 					{
 						Q = glm::cross( T, eVec1);
 
 						v = glm::dot(nDirection, Q)*invP;
 
-						if (v > 0.0f && u + v < 1.0f)
+						if (v > 0.0 && u + v < 1.0)
 						{
 							t = glm::dot(eVec2, Q)*invP;
 							if (t > EPSILON)
@@ -298,100 +298,100 @@ glm::vec3 Ray::evaluate()
 
 	if (rChild && !tChild)
 	{
-		glm::vec3 temp = rChild->evaluate();
-		return sceneObjects->at(objectIndex)->getLightEmission() + ((float)M_PI / sceneObjects->at(objectIndex)->getP())*(rChild->W / W)*(temp + shadowLight);
+		glm::dvec3 temp = rChild->evaluate();
+		return sceneObjects->at(objectIndex)->getLightEmission() + ((double)M_PI / sceneObjects->at(objectIndex)->getP())*(rChild->W / W)*(temp + shadowLight);
 	}
-		
+
 
 	//could be crazy, check
 	if (rChild && tChild)
-		return sceneObjects->at(objectIndex)->getLightEmission() + ((float)M_PI / sceneObjects->at(objectIndex)->getP())*((rChild->W + tChild->W) / W)*(rChild->evaluate() + tChild->evaluate() + shadowLight);
+		return sceneObjects->at(objectIndex)->getLightEmission() + ((double)M_PI / sceneObjects->at(objectIndex)->getP())*((rChild->W + tChild->W) / W)*(rChild->evaluate() + tChild->evaluate() + shadowLight);
 
 	if (tChild)
-		return sceneObjects->at(objectIndex)->getLightEmission() + ((float)M_PI / sceneObjects->at(objectIndex)->getP())*(tChild->W / W)*(tChild->evaluate() + shadowLight);
+		return sceneObjects->at(objectIndex)->getLightEmission() + ((double)M_PI / sceneObjects->at(objectIndex)->getP())*(tChild->W / W)*(tChild->evaluate() + shadowLight);
 
 	if (objectIndex != -1)
-		return sceneObjects->at(objectIndex)->getLightEmission() + ((float)M_PI / sceneObjects->at(objectIndex)->getP())*sceneObjects->at(objectIndex)->BRDF()*(shadowLight);
+		return sceneObjects->at(objectIndex)->getLightEmission() + ((double)M_PI / sceneObjects->at(objectIndex)->getP())*sceneObjects->at(objectIndex)->BRDF()*(shadowLight);
 	else // no intersection
-		return glm::vec3(0.0f, 0.0f, 0.0f);
+		return glm::vec3(0.0, 0.0, 0.0);
 }
 
 void Ray::Transmision()
 {
 }
 
-void Ray::Intersection(glm::vec3 _origin, glm::vec3 _direction)
-{
-	vertex* vertexArray;
-	int vertNr;
-	triangle* triangleArray;
-	int triNr;
-
-	glm::vec3 nOrigin;
-	glm::vec3 nDirection;
-
-	glm::vec3 eVec1;
-	glm::vec3 eVec2;
-	glm::vec3 P; glm::vec3 Q; glm::vec3 T;
-
-	float nearestHit = INF;
-
-	float pLength;
-	float invP; float u; float v; float t;
-	float* temp1; float* temp2;
-
-	for (int i = 0; i < sceneObjects->size(); i++)
-	{
-		//ray in model coordinates
-		nOrigin = glm::vec3(glm::transpose(sceneObjects->at(i)->getOrientation()) * glm::vec4(_origin - sceneObjects->at(i)->getPosition(), 1.0f));
-		nDirection = glm::normalize(glm::vec3(glm::transpose(sceneObjects->at(i)->getOrientation()) * glm::vec4(_direction, 1.0f)));
-
-		vertexArray = sceneObjects->at(i)->getVarray();
-		vertNr = sceneObjects->at(i)->getVertNr();
-		triangleArray = sceneObjects->at(i)->getTarray();
-		triNr = sceneObjects->at(i)->getTriNr();
-
-		for (int j = 0; j < triNr; j++) {
-
-			temp1 = vertexArray[triangleArray[j].index[0]].xyz;
-			temp2 = vertexArray[triangleArray[j].index[1]].xyz;
-			eVec1 = glm::vec3(temp2[0], temp2[1], temp2[2]) - glm::vec3(temp1[0], temp1[1], temp1[2]);
-
-			temp2 = vertexArray[triangleArray[j].index[2]].xyz;
-			eVec2 = glm::vec3(temp2[0], temp2[1], temp2[2]) - glm::vec3(temp1[0], temp1[1], temp1[2]);
-
-			P = glm::cross(nDirection, eVec2);
-
-			pLength = glm::dot(eVec1, P);
-			if (pLength < -EPSILON || pLength > EPSILON)
-			{
-				invP = 1.f / pLength;
-
-				T = nOrigin - glm::vec3(temp1[0], temp1[1], temp1[2]);
-
-				u = glm::dot(T, P) * invP;
-				if (u > 0.0f && u < 1.0f)
-				{
-					Q = glm::cross(T, eVec1);
-
-					v = glm::dot(nDirection, Q)*invP;
-
-					if (v > 0.0f && u + v < 1.0f)
-					{
-						t = glm::dot(eVec2, Q)*invP;
-						if (t > EPSILON)
-						{
-							if (glm::length(nDirection*t) < nearestHit)
-							{
-								objectIndex = i;
-								hitNormal = glm::cross(eVec1, eVec2);
-								nearestHit = glm::length(nDirection*t);
-								hit = nOrigin + nDirection*t;
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-}
+//void Ray::Intersection(glm::vec3 _origin, glm::vec3 _direction)
+//{
+//	vertex* vertexArray;
+//	int vertNr;
+//	triangle* triangleArray;
+//	int triNr;
+//
+//	glm::vec3 nOrigin;
+//	glm::vec3 nDirection;
+//
+//	glm::vec3 eVec1;
+//	glm::vec3 eVec2;
+//	glm::vec3 P; glm::vec3 Q; glm::vec3 T;
+//
+//	float nearestHit = INF;
+//
+//	float pLength;
+//	float invP; float u; float v; float t;
+//	float* temp1; float* temp2;
+//
+//	for (int i = 0; i < sceneObjects->size(); i++)
+//	{
+//		//ray in model coordinates
+//		nOrigin = glm::vec3(glm::transpose(sceneObjects->at(i)->getOrientation()) * glm::vec4(_origin - sceneObjects->at(i)->getPosition(), 1.0f));
+//		nDirection = glm::normalize(glm::vec3(glm::transpose(sceneObjects->at(i)->getOrientation()) * glm::vec4(_direction, 1.0f)));
+//
+//		vertexArray = sceneObjects->at(i)->getVarray();
+//		vertNr = sceneObjects->at(i)->getVertNr();
+//		triangleArray = sceneObjects->at(i)->getTarray();
+//		triNr = sceneObjects->at(i)->getTriNr();
+//
+//		for (int j = 0; j < triNr; j++) {
+//
+//			temp1 = vertexArray[triangleArray[j].index[0]].xyz;
+//			temp2 = vertexArray[triangleArray[j].index[1]].xyz;
+//			eVec1 = glm::vec3(temp2[0], temp2[1], temp2[2]) - glm::vec3(temp1[0], temp1[1], temp1[2]);
+//
+//			temp2 = vertexArray[triangleArray[j].index[2]].xyz;
+//			eVec2 = glm::vec3(temp2[0], temp2[1], temp2[2]) - glm::vec3(temp1[0], temp1[1], temp1[2]);
+//
+//			P = glm::cross(nDirection, eVec2);
+//
+//			pLength = glm::dot(eVec1, P);
+//			if (pLength < -EPSILON || pLength > EPSILON)
+//			{
+//				invP = 1.f / pLength;
+//
+//				T = nOrigin - glm::vec3(temp1[0], temp1[1], temp1[2]);
+//
+//				u = glm::dot(T, P) * invP;
+//				if (u > 0.0f && u < 1.0f)
+//				{
+//					Q = glm::cross(T, eVec1);
+//
+//					v = glm::dot(nDirection, Q)*invP;
+//
+//					if (v > 0.0f && u + v < 1.0f)
+//					{
+//						t = glm::dot(eVec2, Q)*invP;
+//						if (t > EPSILON)
+//						{
+//							if (glm::length(nDirection*t) < nearestHit)
+//							{
+//								objectIndex = i;
+//								hitNormal = glm::cross(eVec1, eVec2);
+//								nearestHit = glm::length(nDirection*t);
+//								hit = nOrigin + nDirection*t;
+//							}
+//						}
+//					}
+//				}
+//			}
+//		}
+//	}
+//}
