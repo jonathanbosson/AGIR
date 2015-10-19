@@ -30,6 +30,7 @@ public:
 
 	glm::vec3 getPosition(){ return position; };
 	glm::mat4 getOrientation(){ return orientation; };
+	glm::mat4 getmodelMat(){ return modelMat; };
 	void getPosition(glm::vec3* vec){ vec->x = position[0]; vec->y = position[1]; vec->z = position[2]; };
 	void getOrientation(glm::mat4* mat);
 	

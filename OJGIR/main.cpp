@@ -35,22 +35,22 @@ int main()
 	//light
 	scene->push_back(new Cuboid(glm::vec3(0.0f, 0.5f, -0.5f),	//position
 		glm::vec3(0.2f, 0.2f, 0.2f),							//dimension
-		glm::vec3(100.0f, 100.0f, 100.0f),						//emission
-		glm::vec3(0.1f, 0.1f, 0.1f), 0.6f));					//brdf and P
+		glm::vec3(0.0f, 100.0f, 100.0f),						//emission
+		glm::vec3(0.0f, 0.0f, 0.0f), 0.2f));					//brdf and P
 	//objects
-	scene->push_back(new Cuboid(glm::vec3(0.5f, 0.5f, -0.5f), 
+	scene->push_back(new Cuboid(glm::vec3(0.6f, 0.5f, -0.5f), 
 		glm::vec3(0.2f, 0.2f, 0.2f), 
-		glm::vec3(5.5f, 5.5f, 5.5f),
-		glm::vec3(0.1f, 0.1f, 0.1f), 0.6f));
+		glm::vec3(0.0f, 0.0f, 0.0f),
+		glm::vec3(0.1f, 0.0f, 0.0f), 0.6f));
 	scene->push_back(new Cuboid(glm::vec3(-0.5f, 0.5f, -0.0f),
 		glm::vec3(0.2f, 0.2f, 0.2f), 
-		glm::vec3(1.5f, 1.5f, 1.5f),
-		glm::vec3(0.1f, 0.1f, 0.1f), 0.6f));
+		glm::vec3(0.0f, 0.0f, 0.0f),
+		glm::vec3(0.0f, 0.1f, 0.1f), 0.6f));
 	//room
 	scene->push_back(new Room(glm::vec3(0.0f, 0.0f, 0.0f), 
 		glm::vec3(1.5f, 1.5f, 1.5f), 
 		glm::vec3(0.0f, 0.0f, 0.0f), 
-		glm::vec3(0.1f, 0.1f, 0.1f), 0.3f));
+		glm::vec3(0.0f, 0.0f, 0.1f), 0.3f));
 	
 	std::cout << "Rendering started...\n";
 	std::cout << "Image Dimensions: " << imgTest.x << "x" << imgTest.y << std::endl;
@@ -88,8 +88,6 @@ int main()
 			tempRGB = glm::vec3(0.0f, 0.0f, 0.0f);
 			for (int p = 0; p < 10; p++)
 			{
-				//rX = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / xStep));
-				//rY = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / yStep));
 				rX = rng.dist(rng.mt) * xStep;
 				rY = rng.dist(rng.mt) * yStep;
 
@@ -97,12 +95,11 @@ int main()
 				glm::vec3 rPos = glm::vec3(cam.getCTransform() * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
 
 				rIt = new Ray(rPos, rDirection, nullptr, scene, rng, glm::vec3(1.0f));
-				tempRGB += glm::vec3(rIt->evaluate());
+				tempRGB += rIt->evaluate();
 
 				delete rIt;
 			}
 
-			//square root this value?
 			imgTest.imgData[i][j] = tempRGB / 10.0f;
 
 			//find max pixel value in image
@@ -129,7 +126,10 @@ int main()
 	
 	imgTest.saveBMP();
 
-	while (true) { }
+
+	while (true) {
+		std::cout << " ";
+	}
 
 	return 0;
 }

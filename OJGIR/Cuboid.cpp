@@ -15,6 +15,9 @@ Cuboid::Cuboid(glm::vec3 _pos, glm::vec3 _dim, glm::vec3 _emission, glm::vec3 _b
 
 	orientation = glm::mat4(1.0f);
 
+
+	modelMat = orientation * glm::translate(position);
+
 	GLfloat vertex_array_data[] = {
 		-_dim.x / 2.0f, -_dim.y / 2.0f, _dim.z / 2.0f,		0.0f, 0.0f, 1.0f,  //1 - 0
 		_dim.x / 2.0f, -_dim.y / 2.0f, _dim.z / 2.0f,		0.0f, 0.0f, 1.0f, //2 - 1
