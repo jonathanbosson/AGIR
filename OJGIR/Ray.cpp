@@ -3,9 +3,9 @@
 #include <math.h>
 //#include "main.cpp"
 
-#define EPSILON  0.00001
-#define M_PI  3.14159265358979323846
-#define INF 9999999999
+#define EPSILON  0.000000001f // 5 nollor
+#define M_PI  3.14159265358979323846f
+#define INF 9999999999.0f
 
 Ray::Ray()
 {
@@ -35,8 +35,8 @@ Ray::Ray(glm::vec3 _origin, glm::vec3 _direction, Ray* _parent, std::vector<Mesh
 	glm::vec3 nOrigin;
 	glm::vec3 nDirection;
 
-	glm::vec3 eVec1;
-	glm::vec3 eVec2;
+	glm::vec3 eVec1; glm::vec3 feVec1;
+	glm::vec3 eVec2; glm::vec3 feVec2;
 	glm::vec3 P; glm::vec3 Q; glm::vec3 T;
 
 	float nearestHit = INF;
@@ -88,6 +88,7 @@ Ray::Ray(glm::vec3 _origin, glm::vec3 _direction, Ray* _parent, std::vector<Mesh
 						{
 							if (glm::length(nDirection*t) < nearestHit)
 							{
+								feVec1 = eVec1;
 								objectIndex = i;
 								hitNormal = glm::cross(eVec1, eVec2);
 								nearestHit = glm::length(nDirection*t);
@@ -99,7 +100,6 @@ Ray::Ray(glm::vec3 _origin, glm::vec3 _direction, Ray* _parent, std::vector<Mesh
 			}
 		}
 	}
-	
 	if (objectIndex == -1) //if no intersection found
 		return;
 
@@ -123,7 +123,7 @@ Ray::Ray(glm::vec3 _origin, glm::vec3 _direction, Ray* _parent, std::vector<Mesh
 		//glm::vec3 rDirection = glm::vec3(cos(randPhi)*sin(randTheta), sin(randPhi)*cos(randTheta), cos(randTheta));		
 		glm::vec3 worldNormal = glm::mat3(sceneObjects->at(objectIndex)->getOrientation())*hitNormal;
 		
-		glm::vec3 upNormal = glm::vec3(1.0f, 1.0f, 1.0f);
+		glm::vec3 upNormal = feVec1;//glm::vec3(1.0f, 1.0f, 1.0f);
 		glm::vec3 normalOrtho = glm::cross(worldNormal, upNormal);
 
 		normalOrtho = glm::rotate(normalOrtho, randPhi, worldNormal);
@@ -297,7 +297,11 @@ glm::vec3 Ray::evaluate()
 	shadowLight = shadowLight; // / 10.0f;
 
 	if (rChild && !tChild)
-		return sceneObjects->at(objectIndex)->getLightEmission() + ((float)M_PI / sceneObjects->at(objectIndex)->getP())*(rChild->W / W)*(rChild->evaluate() + shadowLight);
+	{
+		glm::vec3 temp = rChild->evaluate();
+		return sceneObjects->at(objectIndex)->getLightEmission() + ((float)M_PI / sceneObjects->at(objectIndex)->getP())*(rChild->W / W)*(temp + shadowLight);
+	}
+		
 
 	//could be crazy, check
 	if (rChild && tChild)

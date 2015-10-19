@@ -36,7 +36,7 @@ int main()
 	scene->push_back(new Cuboid(glm::vec3(0.0f, 0.5f, -0.5f),	//position
 		glm::vec3(0.2f, 0.2f, 0.2f),							//dimension
 		glm::vec3(0.0f, 100.0f, 100.0f),						//emission
-		glm::vec3(0.0f, 0.0f, 0.0f), 0.2f));					//brdf and P
+		glm::vec3(0.0f, 0.0f, 0.0f), 0.01f));					//brdf and P
 	//objects
 	scene->push_back(new Cuboid(glm::vec3(0.6f, 0.5f, -0.5f), 
 		glm::vec3(0.2f, 0.2f, 0.2f), 
@@ -78,11 +78,11 @@ int main()
 	float yStep = (2* y) / imgTest.y;
 	glm::vec3 tempRGB;
 	//yStep = xStep;
-	for (int i = 0; i < imgTest.y; i++)
+	for (int i = 0; i < imgTest.y; i++)//173
 	{
 		yCo += yStep;
 		xCo = -x;
-		for (int j = 0; j < imgTest.x; j++)
+		for (int j = 0; j < imgTest.x; j++)//374
 		{
 			xCo += xStep;
 			tempRGB = glm::vec3(0.0f, 0.0f, 0.0f);
