@@ -33,32 +33,32 @@ int main()
 
 	std::vector<Mesh*>* scene = new std::vector<Mesh*>;
 	//light
-	scene->push_back(new Cuboid(glm::dvec3(0.0, 0.5, -0.5),	//position
+	scene->push_back(new Cuboid(glm::dvec3(0.0, 0.75, -0.5),	//position
 		glm::dvec3(0.2, 0.2, 0.2),							//dimension
-		glm::dvec3(100.0, 100.0, 100.0),						//emission
+		glm::dvec3(1000.0, 1000.0, 1000.0),						//emission
 		glm::dvec3(0.0, 0.0, 0.0), 0.01));					//brdf and P
 	//objects
-	scene->push_back(new Cuboid(glm::dvec3(0.6, 0.5, -0.5), 
+	scene->push_back(new Cuboid(glm::dvec3(0.5, 0.3, -0.5), 
 		glm::dvec3(0.2, 0.2, 0.2), 
 		glm::dvec3(0.0, 0.0, 0.0),
-		glm::dvec3(0.1, 0.0, 0.0), 0.6));
-	scene->push_back(new Cuboid(glm::dvec3(-0.5, 0.5, -0.0),
+		glm::dvec3(0.01, 0.01, 0.0), 0.6));
+	scene->push_back(new Cuboid(glm::dvec3(-0.5, -0.3, -0.1),
 		glm::dvec3(0.2, 0.2, 0.2), 
 		glm::dvec3(0.0, 0.0, 0.0),
-		glm::dvec3(0.0, 0.1, 0.1), 0.6f));
+		glm::dvec3(0.0, 0.01, 0.01), 0.6f));
 	//room
 	scene->push_back(new Room(glm::vec3(0.0, 0.0, 0.0), 
 		glm::vec3(1.5, 1.5, 1.5), 
 		glm::vec3(0.0, 0.0, 0.0), 
-		glm::vec3(0.0, 0.0, 0.1), 0.3));
-	scene->push_back(new Cuboid(glm::vec3(-0.74, 0.0, 0.0), 
-		glm::vec3(1.5, 1.5, 1.5), 
+		glm::vec3(0.01, 0.01, 0.01), 0.3));
+	scene->push_back(new Cuboid(glm::vec3(-1.45, 0.0, 0.0), 
+		glm::vec3(1.5, 2.5, 2.5), 
 		glm::vec3(0.0, 0.0, 0.0), 
-		glm::vec3(0.1, 0.1, 0.1), 0.3));
-	scene->push_back(new Cuboid(glm::vec3(0.74, 0.0, 0.0), 
-		glm::vec3(1.5, 1.5, 1.5), 
+		glm::vec3(0.01, 0.0, 0.0), 0.3));
+	scene->push_back(new Cuboid(glm::vec3(1.45, 0.0, 0.0), 
+		glm::vec3(1.5, 2.5, 2.5), 
 		glm::vec3(0.0, 0.0, 0.0), 
-		glm::vec3(0.1, 0.1, 0.1), 0.3));
+		glm::vec3(0.01, 0.0, 0.0), 0.3));
 	
 	std::cout << "Rendering started...\n";
 	std::cout << "Image Dimensions: " << imgTest.x << "x" << imgTest.y << std::endl;
@@ -136,7 +136,7 @@ int main()
 
 
 	while (true) {
-		std::cout << " ";
+		x = x;
 	}
 
 	return 0;
