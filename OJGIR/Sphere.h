@@ -16,7 +16,7 @@ class Sphere : public Mesh
 {
 public:
 	// Creates a sphere  
-	Sphere(glm::vec3 _pos, float _rad);
+	Sphere(glm::dvec3 _pos, float _rad, glm::dvec3 _emission, glm::dvec3 _brdf, double _P);
 	~Sphere();
 
 	Sphere()
@@ -38,8 +38,6 @@ public:
 
 private:
 
-	int nVerts; // Number of vertices in the vertex array
-	int nTris;  // Number of triangles in the index array (may be zero)
 
 	float radius;
 
