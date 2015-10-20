@@ -3,9 +3,9 @@
 #include <math.h>
 //#include "main.cpp"
 
-const double EPSILON = 0.0000000001; // 5 nollor
-#define M_PI  3.14159265358979323846
-#define INF 9999999999.0
+const double EPSILON = 0.000001; // 5 nollor
+const double M_PI = 3.14159265358979323846;
+const double INF = 9999999999.0;
 
 Ray::Ray()
 {
@@ -121,14 +121,28 @@ Ray::Ray(glm::dvec3 _origin, glm::dvec3 _direction, Ray* _parent, std::vector<Me
 		double randPhi = 2 * M_PI*u1;
 		double randTheta = acos(sqrt(u2));
 		//glm::vec3 rDirection = glm::vec3(cos(randPhi)*sin(randTheta), sin(randPhi)*cos(randTheta), cos(randTheta));		
-		glm::dvec3 worldNormal = glm::dmat3(sceneObjects->at(objectIndex)->getOrientation())*hitNormal;
+		//glm::dvec3 worldNormal = glm::dmat3(sceneObjects->at(objectIndex)->getOrientation())*hitNormal;
 
-		glm::dvec3 upNormal = feVec1;//glm::vec3(1.0f, 1.0f, 1.0f);
-		glm::dvec3 normalOrtho = glm::cross(worldNormal, upNormal);
+		//glm::dvec3 upNormal = feVec1;//glm::vec3(1.0f, 1.0f, 1.0f);
+		//glm::dvec3 normalOrtho = glm::cross(worldNormal, upNormal);
 
-		normalOrtho = glm::rotate(normalOrtho, randPhi, worldNormal);
+		//normalOrtho = glm::rotate(normalOrtho, randPhi, worldNormal);
 
-		glm::vec3 rDirection = glm::rotate(worldNormal, randTheta, normalOrtho);
+		//glm::vec3 rDirection = glm::rotate(worldNormal, randTheta, normalOrtho);
+
+		glm::dvec3 rDirection = glm::normalize(glm::dvec3(cos(randPhi)*sin(randTheta), sin(randPhi)*cos(randTheta), cos(randTheta)));		
+		glm::dvec3 worldNormal = glm::normalize(glm::dmat3(sceneObjects->at(objectIndex)->getOrientation())*hitNormal);
+		glm::dvec3 worldFeVec = glm::normalize(glm::dmat3(sceneObjects->at(objectIndex)->getOrientation())*feVec1);
+		
+		//glm::vec3 upNormal = feVec1;//glm::vec3(1.0f, 1.0f, 1.0f);
+		glm::dvec3 normalOrtho = glm::normalize(glm::cross(worldNormal, worldFeVec));
+		glm::dmat3 hemiTrans = glm::dmat3(normalOrtho, worldNormal, worldFeVec);
+		//normalOrtho = glm::rotate(normalOrtho, randPhi, worldNormal);
+
+		//glm::vec3 rDirection = glm::rotate(worldNormal, randTheta, normalOrtho);
+		rDirection = hemiTrans*rDirection;
+		rChild = new Ray(hit, rDirection, this, sceneObjects, _rng, sceneObjects->at(objectIndex)->BRDF()*W);
+		// if (transparent) Transmission();
 
 		rChild = new Ray(hit, rDirection, this, sceneObjects, _rng, sceneObjects->at(objectIndex)->BRDF()*W);
 		// if (transparent) Transmission();
@@ -301,16 +315,11 @@ glm::dvec3 Ray::evaluate()
 		glm::dvec3 temp = rChild->evaluate();
 		return sceneObjects->at(objectIndex)->getLightEmission() + ((double)M_PI / sceneObjects->at(objectIndex)->getP())*(rChild->W / W)*(temp + shadowLight);
 	}
-
-
-	//could be crazy, check
-	if (rChild && tChild)
+	else if (rChild && tChild)//could be crazy, check
 		return sceneObjects->at(objectIndex)->getLightEmission() + ((double)M_PI / sceneObjects->at(objectIndex)->getP())*((rChild->W + tChild->W) / W)*(rChild->evaluate() + tChild->evaluate() + shadowLight);
-
-	if (tChild)
+	else if (tChild)
 		return sceneObjects->at(objectIndex)->getLightEmission() + ((double)M_PI / sceneObjects->at(objectIndex)->getP())*(tChild->W / W)*(tChild->evaluate() + shadowLight);
-
-	if (objectIndex != -1)
+	else if (objectIndex != -1)
 		return sceneObjects->at(objectIndex)->getLightEmission() + ((double)M_PI / sceneObjects->at(objectIndex)->getP())*sceneObjects->at(objectIndex)->BRDF()*(shadowLight);
 	else // no intersection
 		return glm::vec3(0.0, 0.0, 0.0);

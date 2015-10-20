@@ -35,7 +35,7 @@ int main()
 	//light
 	scene->push_back(new Cuboid(glm::dvec3(0.0, 0.5, -0.5),	//position
 		glm::dvec3(0.2, 0.2, 0.2),							//dimension
-		glm::dvec3(0.0, 100.0, 100.0),						//emission
+		glm::dvec3(100.0, 100.0, 100.0),						//emission
 		glm::dvec3(0.0, 0.0, 0.0), 0.01));					//brdf and P
 	//objects
 	scene->push_back(new Cuboid(glm::dvec3(0.6, 0.5, -0.5), 
@@ -51,6 +51,14 @@ int main()
 		glm::vec3(1.5, 1.5, 1.5), 
 		glm::vec3(0.0, 0.0, 0.0), 
 		glm::vec3(0.0, 0.0, 0.1), 0.3));
+	scene->push_back(new Cuboid(glm::vec3(-0.74, 0.0, 0.0), 
+		glm::vec3(1.5, 1.5, 1.5), 
+		glm::vec3(0.0, 0.0, 0.0), 
+		glm::vec3(0.1, 0.1, 0.1), 0.3));
+	scene->push_back(new Cuboid(glm::vec3(0.74, 0.0, 0.0), 
+		glm::vec3(1.5, 1.5, 1.5), 
+		glm::vec3(0.0, 0.0, 0.0), 
+		glm::vec3(0.1, 0.1, 0.1), 0.3));
 	
 	std::cout << "Rendering started...\n";
 	std::cout << "Image Dimensions: " << imgTest.x << "x" << imgTest.y << std::endl;
@@ -95,7 +103,7 @@ int main()
 				glm::dvec3 rPos = glm::dvec3(cam.getCTransform() * glm::dvec4(0.0, 0.0, 0.0, 1.0));
 
 				rIt = new Ray(rPos, rDirection, nullptr, scene, rng, glm::dvec3(1.0));
-				tempRGB += rIt->evaluate();
+				tempRGB = tempRGB + rIt->evaluate();
 
 				delete rIt;
 			}
