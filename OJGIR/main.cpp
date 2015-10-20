@@ -29,23 +29,27 @@ int main()
 {
 	Image imgTest(512, 512 );
 
-	Camera cam(glm::dvec3(0.05, 0.0, 0.74), glm::dvec3(0.05, 0.0, - 1.0));
+	Camera cam(glm::dvec3(0.05, 0.0, 0.7), glm::dvec3(0.05, 0.0, - 1.0));
 
 	std::vector<Mesh*>* scene = new std::vector<Mesh*>;
 	//light
 	scene->push_back(new Cuboid(glm::dvec3(0.0, 0.75, -0.5),	//position
 		glm::dvec3(0.2, 0.2, 0.2),							//dimension
-		glm::dvec3(1000.0, 1000.0, 1000.0),						//emission
+		glm::dvec3(100.0, 100.0, 100.0),						//emission
 		glm::dvec3(0.0, 0.0, 0.0), 0.01));					//brdf and P
 	//objects
 	scene->push_back(new Cuboid(glm::dvec3(0.5, 0.3, -0.5), 
 		glm::dvec3(0.2, 0.2, 0.2), 
 		glm::dvec3(0.0, 0.0, 0.0),
-		glm::dvec3(0.01, 0.01, 0.0), 0.6));
-	scene->push_back(new Cuboid(glm::dvec3(-0.5, -0.3, -0.1),
+		glm::dvec3(0.03, 0.03, 0.01), 0.6));
+	/*scene->push_back(new Cuboid(glm::dvec3(-0.5, -0.3, -0.1),
 		glm::dvec3(0.2, 0.2, 0.2), 
 		glm::dvec3(0.0, 0.0, 0.0),
-		glm::dvec3(0.0, 0.01, 0.01), 0.6f));
+		glm::dvec3(0.0, 0.01, 0.01), 0.6f));*/
+	scene->push_back(new Sphere(glm::dvec3(-0.5, -0.3, -0.2), 0.1f, 
+		glm::dvec3(0.0, 0.0, 0.0),
+		glm::dvec3(0.01, 0.03, 0.03), 0.6f));
+
 	//room
 	scene->push_back(new Room(glm::vec3(0.0, 0.0, 0.0), 
 		glm::vec3(1.5, 1.5, 1.5), 
@@ -54,11 +58,11 @@ int main()
 	scene->push_back(new Cuboid(glm::vec3(-1.45, 0.0, 0.0), 
 		glm::vec3(1.5, 2.5, 2.5), 
 		glm::vec3(0.0, 0.0, 0.0), 
-		glm::vec3(0.01, 0.0, 0.0), 0.3));
+		glm::vec3(0.02, 0.005, 0.005), 0.3));
 	scene->push_back(new Cuboid(glm::vec3(1.45, 0.0, 0.0), 
 		glm::vec3(1.5, 2.5, 2.5), 
 		glm::vec3(0.0, 0.0, 0.0), 
-		glm::vec3(0.01, 0.0, 0.0), 0.3));
+		glm::vec3(0.02, 0.005, 0.005), 0.3));
 	
 	std::cout << "Rendering started...\n";
 	std::cout << "Image Dimensions: " << imgTest.x << "x" << imgTest.y << std::endl;
@@ -71,6 +75,8 @@ int main()
 	std::uniform_real_distribution<float> distribution(0.0, 1.0);
 	std::default_random_engine generator;
 
+	int rPP = 10;
+
 	Ray* rIt;
 	double x = (double) imgTest.x / (double) imgTest.y; 
 	double y = 1.0;//(float) imgTest.y / (float) imgTest.x;
@@ -78,7 +84,7 @@ int main()
 	double yCo = -y;
 	double rX; double rY;
 	double maxI = 0.0;
-	double tmpFloat;
+	double tmpD;
 
 	RNG rng;
 
@@ -94,7 +100,7 @@ int main()
 		{
 			xCo += xStep;
 			tempRGB = glm::dvec3(0.0, 0.0, 0.0);
-			for (int p = 0; p < 10; p++)
+			for (int p = 0; p < rPP; p++)
 			{
 				rX = rng.dist(rng.mt) * xStep;
 				rY = rng.dist(rng.mt) * yStep;
@@ -108,11 +114,11 @@ int main()
 				delete rIt;
 			}
 
-			imgTest.imgData[i][j] = tempRGB / 10.0;
+			imgTest.imgData[i][j] = tempRGB / (double)rPP;
 
 			//find max pixel value in image
-			tmpFloat = std::max(std::max(imgTest.imgData[i][j].x, imgTest.imgData[i][j].y), imgTest.imgData[i][j].z);
-			if(tmpFloat > maxI) maxI = tmpFloat;
+			tmpD = std::max(std::max(imgTest.imgData[i][j].x, imgTest.imgData[i][j].y), imgTest.imgData[i][j].z);
+			if(tmpD > maxI) maxI = tmpD;
 		}
 	}
 

@@ -1,6 +1,8 @@
 #pragma once
 #include "Ray.h"
 #include <math.h>
+#include <algorithm>    // std::max
+
 //#include "main.cpp"
 
 const double EPSILON = 0.000001; // 5 nollor
@@ -103,6 +105,7 @@ Ray::Ray(glm::dvec3 _origin, glm::dvec3 _direction, Ray* _parent, std::vector<Me
 	if (objectIndex == -1) //if no intersection found
 		return;
 
+	hitNormal = glm::normalize(glm::dmat3(sceneObjects->at(objectIndex)->getOrientation())*(hitNormal));
 	hit = glm::dmat3(sceneObjects->at(objectIndex)->getOrientation())*(hit) + (sceneObjects->at(objectIndex)->getPosition());
 	//hit = glm::vec3(sceneObjects->at(objectIndex)->getmodelMat()*glm::vec4(hit, 1.0f));
 	//-< Ray Termination >-------------------------------------------------------------------------------
@@ -161,6 +164,9 @@ Ray::~Ray()
 
 glm::dvec3 Ray::evaluate()
 {
+	if(objectIndex == -1)
+		return glm::dvec3(0.0, 0.0, 0.0);
+
 	bool success;
 	bool shadowSuccess;
 
@@ -186,20 +192,26 @@ glm::dvec3 Ray::evaluate()
 	double shadowLength;
 	glm::dvec3 shadowBase  = sceneObjects->at(0)->getPosition() - hit;
 	glm::dvec3 shadowDir;
+	glm::dvec3 shadowNormal;
 	//shadowLength = glm::length(shadowBase) - 0.1f;
 
-	for(int i = 0; i < 1; i++)
+	const int nrSr = 1;
+
+	for(int i = 0; i < nrSr; i++)
 	{
-		//float rX = rng->dist(rng->mt) * 0.2f - 0.1f;
-		//float rY = rng->dist(rng->mt) * 0.2f - 0.1f;
-		//float rZ = rng->dist(rng->mt) * 0.2f - 0.1f;
+		float rX = rng->dist(rng->mt) * 0.2f - 0.1f;
+		float rY = rng->dist(rng->mt) * 0.2f - 0.1f;
+		float rZ = rng->dist(rng->mt) * 0.2f - 0.1f;
 
 		//nOrigin = hit;
-		//nDirection = glm::normalize(glm::vec3(shadowBase.x+rX, shadowBase.y+rY, shadowBase.z+rZ));
-		shadowDir = glm::normalize(shadowBase);
+		shadowDir = glm::normalize(glm::vec3(shadowBase.x+rX, shadowBase.y+rY, shadowBase.z+rZ));
+		//shadowDir = glm::normalize(shadowBase);
+		if(glm::dot(shadowDir, hitNormal) < EPSILON)
+			continue;
 
-		nOrigin = glm::dvec3(glm::transpose(sceneObjects->at(i)->getOrientation()) * glm::dvec4(hit - sceneObjects->at(i)->getPosition(), 1.0f));
-		nDirection = glm::normalize(glm::dvec3(glm::transpose(sceneObjects->at(i)->getOrientation()) * glm::dvec4(shadowDir, 1.0f)));
+
+		nOrigin = glm::dvec3(glm::transpose(sceneObjects->at(0)->getOrientation()) * glm::dvec4(hit - sceneObjects->at(0)->getPosition(), 1.0f));
+		nDirection = glm::normalize(glm::dvec3(glm::transpose(sceneObjects->at(0)->getOrientation()) * glm::dvec4(shadowDir, 1.0f)));
 
 		success = true;
 		shadowSuccess = false;
@@ -242,29 +254,34 @@ glm::dvec3 Ray::evaluate()
 						t = glm::dot(eVec2, Q)*invP;
 						if (t > EPSILON)
 						{
-							shadowSuccess = true;
 							if (glm::length(nDirection*t) < shadowLength)
 							{
 								shadowLength = glm::length(nDirection*t);
+								shadowNormal = glm::cross(eVec1, eVec2);
+								shadowSuccess = true;
 							}
 						}
 					}
 				}
 			}
 		}
+		if(!shadowSuccess)
+			continue;
+
+		shadowNormal = glm::normalize(glm::dmat3(sceneObjects->at(0)->getOrientation())*(shadowNormal));
 
 		//search scene to see if any objects oclude the lightsource -------------------------------------------------------
-		for (int i = 1; i < sceneObjects->size(); i++)
+		for (int k = 1; k < sceneObjects->size(); k++)
 		{
-			nOrigin = glm::dvec3(glm::transpose(sceneObjects->at(i)->getOrientation()) * glm::dvec4(hit - sceneObjects->at(i)->getPosition(), 1.0));
-			nDirection = glm::normalize(glm::dvec3(glm::transpose(sceneObjects->at(i)->getOrientation()) * glm::dvec4(shadowDir, 1.0)));
+			nOrigin = glm::dvec3(glm::transpose(sceneObjects->at(k)->getOrientation()) * glm::dvec4(hit - sceneObjects->at(k)->getPosition(), 1.0));
+			nDirection = glm::normalize(glm::dvec3(glm::transpose(sceneObjects->at(k)->getOrientation()) * glm::dvec4(shadowDir, 1.0)));
 			//nOrigin = glm::vec3(glm::inverse(sceneObjects->at(i)->getmodelMat())* glm::vec4(hit, 1.0f));
 			//nDirection = glm::vec3(glm::inverse(sceneObjects->at(i)->getmodelMat())* glm::vec4(shadowDir, 1.0f));
 
-			vertexArray = sceneObjects->at(i)->getVarray();
-			vertNr = sceneObjects->at(i)->getVertNr();
-			triangleArray = sceneObjects->at(i)->getTarray();
-			triNr = sceneObjects->at(i)->getTriNr();
+			vertexArray = sceneObjects->at(k)->getVarray();
+			vertNr = sceneObjects->at(k)->getVertNr();
+			triangleArray = sceneObjects->at(k)->getTarray();
+			triNr = sceneObjects->at(k)->getTriNr();
 
 			for (int j = 0; j < triNr; j++) {
 
@@ -309,27 +326,30 @@ glm::dvec3 Ray::evaluate()
 			if (!success) break;
 		}
 		if(success)
-			shadowLight += sceneObjects->at(0)->getLightEmission();
-	}
-	shadowLight = shadowLight; // / 10.0f;
+			shadowLight += sceneObjects->at(0)->getLightEmission()*sceneObjects->at(objectIndex)->BRDF()*(glm::dot(shadowNormal, (-1.0)*shadowDir)*glm::dot(hitNormal, shadowDir)/(std::max(shadowLength*shadowLength, 1.0)));
+			//shadowLight += sceneObjects->at(0)->getLightEmission()*sceneObjects->at(objectIndex)->BRDF()*((double)M_PI / sceneObjects->at(objectIndex)->getP()); 	
+}
+	shadowLight = shadowLight / (double)nrSr;
 
 	if (rChild && !tChild)
 	{
-		glm::dvec3 temp = rChild->evaluate();
-		temp = temp + shadowLight;
-		temp = (rChild->W / W)*temp;
-		double tempD = ((double)M_PI / sceneObjects->at(objectIndex)->getP());
-		temp = tempD*temp;
-		temp = temp + sceneObjects->at(objectIndex)->getLightEmission();
-		return temp;
-		//return sceneObjects->at(objectIndex)->getLightEmission() + ((double)M_PI / sceneObjects->at(objectIndex)->getP())*(rChild->W / W)*(temp + shadowLight);
+		//glm::dvec3 temp = rChild->evaluate();
+		//temp = temp + shadowLight;
+		//temp = (rChild->W / W)*temp;
+		//double tempD = ((double)M_PI / sceneObjects->at(objectIndex)->getP());
+		//temp = tempD*temp;
+		//temp = temp + sceneObjects->at(objectIndex)->getLightEmission();
+		//return temp;
+		//return sceneObjects->at(objectIndex)->getLightEmission() + ((double)M_PI / sceneObjects->at(objectIndex)->getP())*(rChild->W / W)*(rChild->evaluate() + shadowLight);
+		return sceneObjects->at(objectIndex)->getLightEmission() + ((double)M_PI / sceneObjects->at(objectIndex)->getP())*(rChild->W / W)*(rChild->evaluate())  + shadowLight;
 	}
 	else if (rChild && tChild)//could be crazy, check
 		return sceneObjects->at(objectIndex)->getLightEmission() + ((double)M_PI / sceneObjects->at(objectIndex)->getP())*((rChild->W + tChild->W) / W)*(rChild->evaluate() + tChild->evaluate() + shadowLight);
 	else if (tChild)
 		return sceneObjects->at(objectIndex)->getLightEmission() + ((double)M_PI / sceneObjects->at(objectIndex)->getP())*(tChild->W / W)*(tChild->evaluate() + shadowLight);
 	else if (objectIndex != -1)
-		return sceneObjects->at(objectIndex)->getLightEmission() + ((double)M_PI / sceneObjects->at(objectIndex)->getP())*sceneObjects->at(objectIndex)->BRDF()*(shadowLight);
+		return sceneObjects->at(objectIndex)->getLightEmission() + (shadowLight);
+		//return sceneObjects->at(objectIndex)->getLightEmission() + ((double)M_PI / sceneObjects->at(objectIndex)->getP())*sceneObjects->at(objectIndex)->BRDF()*(shadowLight);
 	else // no intersection
 		return glm::dvec3(0.0, 0.0, 0.0);
 }
