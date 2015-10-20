@@ -1,6 +1,6 @@
 #include "Sphere.h"
 
-Sphere::Sphere(glm::vec3 _pos, float _rad)
+Sphere::Sphere(glm::dvec3 _pos, float _rad, glm::dvec3 _emission, glm::dvec3 _brdf, double _P)
 {
 	position[0] = _pos[0];
 	position[1] = _pos[1];
@@ -8,37 +8,41 @@ Sphere::Sphere(glm::vec3 _pos, float _rad)
 
 	radius = _rad;
 
+	brdf = _brdf;
+	lightEmission = _emission;
+	P = _P;
+
 	float GOOD_M_PI = 3.14159265358979323846;
 	int i, j, base, i0;
 	float x, y, z, R;
 	double theta, phi;
 	int vsegs, hsegs;
-	int stride = 8;
+	int stride = 6; // number of variables in a vertex (pos, normal, texture (ts))
 
 	// Delete any previous content in the TriangleSoup object
 
-	int segments = 32;
+	int segments = 2;
 
 	vsegs = segments;
 	if (vsegs < 2) vsegs = 2;
 	hsegs = vsegs * 2;
 	nVerts = 1 + (vsegs - 1) * (hsegs + 1) + 1; // top + middle + bottom
 	nTris = hsegs + (vsegs - 2) * hsegs * 2 + hsegs; // top + middle + bottom
-	vertexArray = new vertex[nVerts ];
+	vertexArray = new vertex[nVerts];
 	indexArray = new triangle[nTris];
 
 	// The vertex array: 3D xyz, 3D normal, 2D st (8 floats per vertex)
 	// First vertex: top pole (+z is "up" in object local coords)
 	vertexArray[0].xyz[0] = 0.0f;
-	vertexArray[1].xyz[1] = 0.0f;
-	vertexArray[2].xyz[2] = radius;
-	vertexArray[3].nxyz[0] = 0.0f;
-	vertexArray[4].nxyz[1] = 0.0f;
-	vertexArray[5].nxyz[2] = 1.0f;
+	vertexArray[0].xyz[1] = 0.0f;
+	vertexArray[0].xyz[2] = radius;
+	vertexArray[0].nxyz[0] = 0.0f;
+	vertexArray[0].nxyz[1] = 0.0f;
+	vertexArray[0].nxyz[2] = 1.0f;
 	//vertexArray[6] = 0.5f;
 	//vertexArray[7] = 1.0f;
 	// Last vertex: bottom pole
-	base = (nVerts - 1)*stride;
+	base = (nVerts - 1);
 	vertexArray[base].xyz[0] = 0.0f;
 	vertexArray[base].xyz[1] = 0.0f;
 	vertexArray[base].xyz[2] = -radius;
@@ -58,7 +62,7 @@ Sphere::Sphere(glm::vec3 _pos, float _rad)
 			phi = (double)i / hsegs*2.0*GOOD_M_PI;
 			x = R*cos(phi);
 			y = R*sin(phi);
-			base = (1 + j*(hsegs + 1) + i)*stride;
+			base = (1 + j*(hsegs + 1) + i);
 			vertexArray[base].xyz[0] = radius*x;
 			vertexArray[base].xyz[1] = radius*y;
 			vertexArray[base].xyz[2] = radius*z;
@@ -80,22 +84,23 @@ Sphere::Sphere(glm::vec3 _pos, float _rad)
 	// Middle part (possibly empty if vsegs=2)
 	for (j = 0; j<vsegs - 2; j++) {
 		for (i = 0; i<hsegs; i++) {
-			base = 3 * (hsegs + 2 * (j*hsegs + i));
+			base = hsegs + 2 * (j*hsegs + i);
 			i0 = 1 + j*(hsegs + 1) + i;
 			indexArray[base].index[0] = i0;
 			indexArray[base].index[1] = i0 + hsegs + 1;
 			indexArray[base].index[2] = i0 + 1;
-			indexArray[base+1].index[0] = i0 + 1;
+
+			indexArray[base + 1].index[0] = i0 + 1;
 			indexArray[base + 1].index[1] = i0 + hsegs + 1;
 			indexArray[base + 1].index[2] = i0 + hsegs + 2;
 		}
 	}
 	// Bottom cap
-	base = 3 * (hsegs + 2 * (vsegs - 2)*hsegs);
+	base = hsegs + 2 * (vsegs - 2)*hsegs;
 	for (i = 0; i<hsegs; i++) {
-		indexArray[base + 3 * i].index[0] = nVerts - 1;
-		indexArray[base + 3 * i].index[1] = nVerts - 2 - i;
-		indexArray[base + 3 * i].index[2] = nVerts - 3 - i;
+		indexArray[base + i].index[0] = nVerts - 1;
+		indexArray[base + i].index[1] = nVerts - 2 - i;
+		indexArray[base + i].index[2] = nVerts - 3 - i;
 	}
 
 }
