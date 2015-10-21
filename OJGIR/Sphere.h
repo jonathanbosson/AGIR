@@ -30,6 +30,9 @@ public:
 		nTris = 0;
 	};
 
+
+	double getArea() {return radius*3.14159265358979323846;}
+
 	void createSphere(float radius, int segments);
 	void createBuffers();
 	void render();

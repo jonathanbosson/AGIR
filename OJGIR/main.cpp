@@ -33,29 +33,33 @@ int main()
 
 	std::vector<Mesh*>* scene = new std::vector<Mesh*>;
 	//light
-	scene->push_back(new Cuboid(glm::dvec3(0.0, 0.75, -0.5),	//position
+	scene->push_back(new Cuboid(glm::dvec3(0.0, 0.82, -0.3),	//position
 		glm::dvec3(0.2, 0.2, 0.2),							//dimension
 		glm::dvec3(100.0, 100.0, 100.0),						//emission
-		glm::dvec3(0.0, 0.0, 0.0), 0.01));					//brdf and P
+		glm::dvec3(0.001, 0.001, 0.001), 0.01));					//brdf and P
 	//objects
 	scene->push_back(new Cuboid(glm::dvec3(0.5, 0.3, -0.5), 
 		glm::dvec3(0.2, 0.2, 0.2), 
 		glm::dvec3(0.0, 0.0, 0.0),
-		glm::dvec3(0.03, 0.03, 0.01), 0.6));
+		glm::dvec3(0.1, 0.1, 0.01), 0.6));
 	/*scene->push_back(new Cuboid(glm::dvec3(-0.5, -0.3, -0.1),
 		glm::dvec3(0.2, 0.2, 0.2), 
 		glm::dvec3(0.0, 0.0, 0.0),
 		glm::dvec3(0.0, 0.01, 0.01), 0.6f));*/
 	scene->push_back(new Sphere(glm::dvec3(-0.5, -0.3, -0.2), 0.1f, 
 		glm::dvec3(0.0, 0.0, 0.0),
-		glm::dvec3(0.01, 0.03, 0.03), 0.6f));
+		glm::dvec3(0.01, 0.1, 0.1), 0.6f));
 
 	//room
 	scene->push_back(new Room(glm::vec3(0.0, 0.0, 0.0), 
 		glm::vec3(1.5, 1.5, 1.5), 
 		glm::vec3(0.0, 0.0, 0.0), 
-		glm::vec3(0.01, 0.01, 0.01), 0.3));
-	scene->push_back(new Cuboid(glm::vec3(-1.45, 0.0, 0.0), 
+		glm::vec3(0.05, 0.05, 0.05), 0.3));
+	scene->push_back(new Room(glm::vec3(0.0, 0.0, 0.0), 
+		glm::vec3(1.4, 2.5, 2.5), 
+		glm::vec3(0.0, 0.0, 0.0), 
+		glm::vec3(0.05, 0.005, 0.005), 0.3));
+	/*scene->push_back(new Cuboid(glm::vec3(-1.45, 0.0, 0.0), 
 		glm::vec3(1.5, 2.5, 2.5), 
 		glm::vec3(0.0, 0.0, 0.0), 
 		glm::vec3(0.02, 0.005, 0.005), 0.3));
@@ -63,7 +67,7 @@ int main()
 		glm::vec3(1.5, 2.5, 2.5), 
 		glm::vec3(0.0, 0.0, 0.0), 
 		glm::vec3(0.02, 0.005, 0.005), 0.3));
-	
+	*/
 	std::cout << "Rendering started...\n";
 	std::cout << "Image Dimensions: " << imgTest.x << "x" << imgTest.y << std::endl;
 	clock_t begin = clock();
@@ -75,7 +79,7 @@ int main()
 	std::uniform_real_distribution<float> distribution(0.0, 1.0);
 	std::default_random_engine generator;
 
-	int rPP = 10;
+	int rPP = 40;
 
 	Ray* rIt;
 	double x = (double) imgTest.x / (double) imgTest.y; 

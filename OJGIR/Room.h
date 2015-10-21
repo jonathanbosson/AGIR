@@ -29,6 +29,9 @@ public:
 
 	Room(glm::dvec3 _pos, glm::dvec3 _dim, glm::dvec3 _emission, glm::dvec3 _brdf, double _P);
 
+	//TODO: do it properly
+	double getArea() {return dim[0]*dim[1];}
+
 	void createBuffers();
 	~Room();
 

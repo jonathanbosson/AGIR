@@ -34,6 +34,7 @@ public:
 	void getPosition(glm::vec3* vec){ vec->x = position[0]; vec->y = position[1]; vec->z = position[2]; };
 	void getOrientation(glm::mat4* mat);
 	
+	virtual double getArea() = 0;
 
 
 	void setPosition(glm::vec3 p) { position = p;// position[1] = p[1]; position[2] = p[2];

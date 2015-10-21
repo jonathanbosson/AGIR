@@ -127,7 +127,7 @@ Ray::Ray(glm::dvec3 _origin, glm::dvec3 _direction, Ray* _parent, std::vector<Me
 		//rotating vectors example -----------------------------------------------------------------------------------
 		//glm::vec3 rDirection = glm::vec3(cos(randPhi)*sin(randTheta), sin(randPhi)*cos(randTheta), cos(randTheta));		
 		glm::dvec3 worldNormal = glm::dmat3(sceneObjects->at(objectIndex)->getOrientation())*hitNormal;
-		glm::dvec3 worldFeVec = glm::normalize(glm::dmat3(sceneObjects->at(objectIndex)->getOrientation())*feVec1);
+		glm::dvec3 worldFeVec = glm::dmat3(sceneObjects->at(objectIndex)->getOrientation())*feVec1;
 		//glm::dvec3 upNormal = feVec1;//glm::vec3(1.0f, 1.0f, 1.0f);
 		//glm::dvec3 normalOrtho = glm::cross(worldNormal, worldFeVec);
 
@@ -150,7 +150,7 @@ Ray::Ray(glm::dvec3 _origin, glm::dvec3 _direction, Ray* _parent, std::vector<Me
 		////glm::vec3 rDirection = glm::rotate(worldNormal, randTheta, normalOrtho);
 		//rDirection = hemiTrans*rDirection;
 
-		rChild = new Ray(hit, rDirection, this, sceneObjects, _rng, sceneObjects->at(objectIndex)->BRDF()*W);
+		rChild = new Ray(hit, rDirection, this, sceneObjects, _rng, M_PI*sceneObjects->at(objectIndex)->BRDF()*W);
 		// if (transparent) Transmission();
 	}
 }
@@ -163,8 +163,9 @@ Ray::~Ray()
 
 
 glm::dvec3 Ray::evaluate()
-{
-	if(objectIndex == -1)
+{ 
+	//if(objectIndex == -1 || std::max(std::max(W.y, W.z), W.x) < EPSILON )
+	if(objectIndex == -1 || glm::length(W) < EPSILON )
 		return glm::dvec3(0.0, 0.0, 0.0);
 
 	bool success;
@@ -195,10 +196,11 @@ glm::dvec3 Ray::evaluate()
 	glm::dvec3 shadowNormal;
 	//shadowLength = glm::length(shadowBase) - 0.1f;
 
-	const int nrSr = 1;
+	const int nrSr = 10;
 
 	for(int i = 0; i < nrSr; i++)
 	{
+		//TODO: look into making this direction dependant on distance to lightsource and maybe change to random angles instead
 		float rX = rng->dist(rng->mt) * 0.2f - 0.1f;
 		float rY = rng->dist(rng->mt) * 0.2f - 0.1f;
 		float rZ = rng->dist(rng->mt) * 0.2f - 0.1f;
@@ -208,7 +210,6 @@ glm::dvec3 Ray::evaluate()
 		//shadowDir = glm::normalize(shadowBase);
 		if(glm::dot(shadowDir, hitNormal) < EPSILON)
 			continue;
-
 
 		nOrigin = glm::dvec3(glm::transpose(sceneObjects->at(0)->getOrientation()) * glm::dvec4(hit - sceneObjects->at(0)->getPosition(), 1.0f));
 		nDirection = glm::normalize(glm::dvec3(glm::transpose(sceneObjects->at(0)->getOrientation()) * glm::dvec4(shadowDir, 1.0f)));
@@ -326,9 +327,9 @@ glm::dvec3 Ray::evaluate()
 			if (!success) break;
 		}
 		if(success)
-			shadowLight += sceneObjects->at(0)->getLightEmission()*sceneObjects->at(objectIndex)->BRDF()*(glm::dot(shadowNormal, (-1.0)*shadowDir)*glm::dot(hitNormal, shadowDir)/(std::max(shadowLength*shadowLength, 1.0)));
+			shadowLight += sceneObjects->at(0)->getArea()*sceneObjects->at(0)->getLightEmission()*sceneObjects->at(objectIndex)->BRDF()*(glm::dot(shadowNormal, (-1.0)*shadowDir)*glm::dot(hitNormal, shadowDir)/(std::max(shadowLength*shadowLength, 0.01)));
 			//shadowLight += sceneObjects->at(0)->getLightEmission()*sceneObjects->at(objectIndex)->BRDF()*((double)M_PI / sceneObjects->at(objectIndex)->getP()); 	
-}
+} 
 	shadowLight = shadowLight / (double)nrSr;
 
 	if (rChild && !tChild)
@@ -341,17 +342,21 @@ glm::dvec3 Ray::evaluate()
 		//temp = temp + sceneObjects->at(objectIndex)->getLightEmission();
 		//return temp;
 		//return sceneObjects->at(objectIndex)->getLightEmission() + ((double)M_PI / sceneObjects->at(objectIndex)->getP())*(rChild->W / W)*(rChild->evaluate() + shadowLight);
-		return sceneObjects->at(objectIndex)->getLightEmission() + ((double)M_PI / sceneObjects->at(objectIndex)->getP())*(rChild->W / W)*(rChild->evaluate())  + shadowLight;
+
+		//TODO: PI has been removed from this equation, perhaps wrong
+		return sceneObjects->at(objectIndex)->getLightEmission() + ((rChild->W / W)/sceneObjects->at(objectIndex)->getP()) * rChild->evaluate() + shadowLight;
 	}
+	//TODO: the 2 following equations are completely wrong and need to be rewritten
 	else if (rChild && tChild)//could be crazy, check
 		return sceneObjects->at(objectIndex)->getLightEmission() + ((double)M_PI / sceneObjects->at(objectIndex)->getP())*((rChild->W + tChild->W) / W)*(rChild->evaluate() + tChild->evaluate() + shadowLight);
 	else if (tChild)
 		return sceneObjects->at(objectIndex)->getLightEmission() + ((double)M_PI / sceneObjects->at(objectIndex)->getP())*(tChild->W / W)*(tChild->evaluate() + shadowLight);
+	
 	else if (objectIndex != -1)
 		return sceneObjects->at(objectIndex)->getLightEmission() + (shadowLight);
 		//return sceneObjects->at(objectIndex)->getLightEmission() + ((double)M_PI / sceneObjects->at(objectIndex)->getP())*sceneObjects->at(objectIndex)->BRDF()*(shadowLight);
-	else // no intersection
-		return glm::dvec3(0.0, 0.0, 0.0);
+	//else // no intersection
+	//	return glm::dvec3(0.0, 0.0, 0.0);
 }
 
 void Ray::Transmision()

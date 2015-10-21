@@ -32,6 +32,8 @@ public:
 
 	Plane(float x, float y, float z, float dX, float dZ);
 
+	double getArea() {return dim[0]*dim[1];}
+
 	void render();
 	void createBuffers();
 

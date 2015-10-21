@@ -33,6 +33,9 @@ public:
 	void createBuffers();
 	~Cuboid();
 
+	//TODO: do it properly
+	double getArea() {return dim[0]*dim[1];}
+
 	void render();
 
 private:
