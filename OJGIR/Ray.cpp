@@ -196,7 +196,7 @@ glm::dvec3 Ray::evaluate()
 	glm::dvec3 shadowNormal;
 	//shadowLength = glm::length(shadowBase) - 0.1f;
 
-	const int nrSr = 10;
+	const int nrSr = 1;
 
 	for(int i = 0; i < nrSr; i++)
 	{

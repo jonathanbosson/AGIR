@@ -70,7 +70,7 @@ int main()
 	*/
 	
 	time_t t; std::time(&t);
-	std::cout << "Rendering started " << std::asctime(std::localtime(&t)) << "\n";
+	std::cout << "Rendering started: " << std::asctime(std::localtime(&t));
 	std::cout << "Image Dimensions: " << imgTest.x << "x" << imgTest.y << std::endl;
 	clock_t begin = clock();
 		
@@ -80,7 +80,7 @@ int main()
 	std::uniform_real_distribution<float> distribution(0.0, 1.0);
 	std::default_random_engine generator;
 
-	int rPP = 40;
+	int rPP = 10;
 
 	Ray* rIt;
 	double x = (double) imgTest.x / (double) imgTest.y; 
@@ -141,7 +141,8 @@ int main()
 		
 	clock_t end = clock();
 	double elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
-	std::cout << "Rendering done. Elapsed time: " << elapsed_secs << " seconds." << std::endl;
+	std::time(&t);
+	std::cout << "-" << std::endl << "Rendering done: " << std::asctime(std::localtime(&t)) << " Elapsed time: " << elapsed_secs << " seconds." << std::endl;
 	
 	imgTest.saveBMP();
 
