@@ -68,11 +68,12 @@ int main()
 		glm::vec3(0.0, 0.0, 0.0), 
 		glm::vec3(0.02, 0.005, 0.005), 0.3));
 	*/
-	std::cout << "Rendering started...\n";
+	
+	time_t t; std::time(&t);
+	std::cout << "Rendering started " << std::asctime(std::localtime(&t)) << "\n";
 	std::cout << "Image Dimensions: " << imgTest.x << "x" << imgTest.y << std::endl;
 	clock_t begin = clock();
-
-
+		
 	//start rendering--------------------------------------------------------------
 	//seed random numbers
 	//srand(static_cast <unsigned> (time(0)));
