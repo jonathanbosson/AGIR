@@ -27,7 +27,7 @@
 
 int main()
 {
-	Image imgTest(512, 512 );
+	Image imgTest(1920, 1080 );
 
 	Camera cam(glm::dvec3(0.05, 0.0, 0.7), glm::dvec3(0.05, 0.0, - 1.0));
 
@@ -46,6 +46,9 @@ int main()
 		glm::dvec3(0.2, 0.2, 0.2), 
 		glm::dvec3(0.0, 0.0, 0.0),
 		glm::dvec3(0.0, 0.01, 0.01), 0.6f));*/
+	scene->push_back(new Sphere(glm::dvec3(0.5, -0.2, 0.0), 0.1f,
+		glm::dvec3(0.0, 0.0, 0.0),
+		glm::dvec3(0.01, 0.1, 0.1), 0.6f));
 	scene->push_back(new Sphere(glm::dvec3(-0.5, -0.3, -0.2), 0.1f, 
 		glm::dvec3(0.0, 0.0, 0.0),
 		glm::dvec3(0.01, 0.1, 0.1), 0.6f));
