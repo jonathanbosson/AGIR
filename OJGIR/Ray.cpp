@@ -327,8 +327,9 @@ glm::dvec3 Ray::evaluate()
 			if (!success) break;
 		}
 		if(success)
-			shadowLight += sceneObjects->at(0)->getArea()*sceneObjects->at(0)->getLightEmission()*sceneObjects->at(objectIndex)->BRDF()*(glm::dot(shadowNormal, (-1.0)*shadowDir)*glm::dot(hitNormal, shadowDir)/(std::max(shadowLength*shadowLength, 0.01)));
-			//shadowLight += sceneObjects->at(0)->getLightEmission()*sceneObjects->at(objectIndex)->BRDF()*((double)M_PI / sceneObjects->at(objectIndex)->getP()); 	
+			shadowLight += 10.0*sceneObjects->at(0)->getLightEmission()*sceneObjects->at(objectIndex)->BRDF()*(glm::dot(shadowNormal, (-1.0)*shadowDir)*glm::dot(hitNormal, shadowDir) / (std::max(shadowLength*shadowLength, 1.0)));
+			//shadowLight += sceneObjects->at(0)->getArea()*sceneObjects->at(0)->getLightEmission()*sceneObjects->at(objectIndex)->BRDF()*(glm::dot(shadowNormal, (-1.0)*shadowDir)*glm::dot(hitNormal, shadowDir)/(std::max(shadowLength*shadowLength, 0.01)));
+				
 } 
 	shadowLight = shadowLight / (double)nrSr;
 
