@@ -48,7 +48,7 @@ int main()
 		glm::dvec3(0.0, 0.01, 0.01), 0.6f));*/
 	scene->push_back(new Sphere(glm::dvec3(0.5, -0.2, 0.0), 0.1f,
 		glm::dvec3(0.0, 0.0, 0.0),
-		glm::dvec3(0.01, 0.1, 0.1), 0.6f));
+		glm::dvec3(0.1, 0.01, 0.1), 0.6f));
 	scene->push_back(new Sphere(glm::dvec3(-0.5, -0.3, -0.2), 0.1f, 
 		glm::dvec3(0.0, 0.0, 0.0),
 		glm::dvec3(0.01, 0.1, 0.1), 0.6f));
